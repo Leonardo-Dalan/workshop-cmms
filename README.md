@@ -27,7 +27,7 @@ Workshop is a factory maintenance request system. Production logs a machine stop
 
 ## Demo
 
-The live link will be added after the deploy on Netlify.
+Live demo: https://maintenancews.netlify.app
 
 Demo logins:
 
