@@ -1,0 +1,3433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Workshop · Maintenance requests</title>
+<meta name="description" content="Factory maintenance requests: production opens the WO, maintenance handles it and history feeds the dashboard.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%20fill%3D'none'%3E%3Cpath%20d%3D'M16%203.5%2027%209.8v12.4L16%2028.5%205%2022.2V9.8L16%203.5Z'%20stroke%3D'%235cc9dd'%20stroke-width%3D'2'%2F%3E%3Cpath%20d%3D'M10.5%2019.5h4.3l2.2-4.6%202.5%207.1%201.8-3.7h2.2'%20stroke%3D'%235cc9dd'%20stroke-width%3D'2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#0c0d0f;
+  --surface:#15171a;
+  --raised:#1c1f23;
+  --raised-2:#24282d;
+  --active:#22262b;
+  --border:#26292d;
+  --rule:#202327;
+  --control:#3a4046;
+  --text:#f2f3f4;
+  --muted:#b6bac0;
+  --faint:#9aa0a6;
+  --accent:#5cc9dd;
+  --accent-soft:#122a30;
+  --positive:#55c98b;
+  --positive-soft:#14271f;
+  --negative:#ef7183;
+  --negative-soft:#2b1a20;
+  --warning:#e5b45c;
+  --warning-soft:#2a2418;
+  --grid:#282c30;
+  --radius-card:16px;
+  --radius-inner:10px;
+  --radius-pill:999px;
+  --gap:16px;
+  --pad:24px;
+  --nav-row:36px;
+  --control-height:36px;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --fs-lead:30px;
+  --fs-kpi:24px;
+  --fs-title:20px;
+  --fs-section:16px;
+  --fs-body:14px;
+  --fs-small:13px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ground)}
+body{margin:0;background:var(--ground);color:var(--text);font-family:var(--font);font-size:var(--fs-body);line-height:1.45;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+h1,h2,h3,p{margin:0}
+svg{display:block}
+.hidden{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+::selection{background:var(--accent);color:var(--ground)}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.skip-link{position:absolute;left:12px;top:-60px;z-index:100;background:var(--text);color:var(--ground);padding:10px 14px;border-radius:8px;font-size:14px;text-decoration:none}
+.skip-link:focus{top:12px}
+.mark{display:block;width:28px;height:28px;flex:none;color:var(--accent)}
+.mark svg{width:100%;height:100%}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--faint);display:inline-block;flex:none}
+.dot.green{background:var(--positive)}
+.dot.amber{background:var(--warning)}
+.dot.red{background:var(--negative)}
+.dot.cyan{background:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:var(--control-height);padding:0 16px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--text);font-size:var(--fs-body);font-weight:500;white-space:nowrap;text-decoration:none;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.btn svg{width:16px;height:16px;flex:none}
+.btn-primary{background:var(--text);border-color:var(--text);color:#0a0b0c}
+.btn-primary:hover{background:#dfe2e5;border-color:#dfe2e5}
+.btn-secondary{border-color:var(--control);color:var(--text)}
+.btn-secondary:hover{background:var(--raised);border-color:var(--muted)}
+.btn-ghost{color:var(--muted)}
+.btn-ghost:hover{background:var(--raised);color:var(--text)}
+.btn-sm{height:30px;padding:0 12px;font-size:var(--fs-small)}
+.btn-outline-danger{border-color:var(--negative);color:var(--negative)}
+.btn-outline-danger:hover{background:var(--negative-soft)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.text-btn{background:none;border:0;padding:6px 8px;border-radius:8px;font-size:var(--fs-small);color:var(--muted);text-align:left}
+.text-btn:hover{background:var(--raised);color:var(--text)}
+.text-btn.danger{color:var(--negative)}
+.text-btn.danger:hover{background:var(--negative-soft)}
+.icon-btn{display:grid;place-items:center;width:32px;height:32px;border-radius:var(--radius-pill);border:1px solid transparent;background:transparent;color:var(--muted);flex:none}
+.icon-btn:hover{background:var(--raised);color:var(--text)}
+.input,select,textarea{width:100%;height:var(--control-height);border:1px solid var(--control);border-radius:var(--radius-inner);background:var(--ground);padding:0 12px;color:var(--text);font-size:var(--fs-body)}
+select{padding-right:12px}
+textarea{height:auto;min-height:84px;padding:10px 12px;resize:vertical;line-height:1.45}
+.input:hover,select:hover,textarea:hover{border-color:var(--muted)}
+.input:focus,select:focus,textarea:focus{outline:none;border-color:var(--faint)}
+.field{display:grid;gap:8px;min-width:0}
+.field>label{font-size:var(--fs-small);font-weight:500;color:var(--muted)}
+.field-desc{font-size:var(--fs-small);color:var(--faint);line-height:1.45}
+.form-error{min-height:17px;font-size:var(--fs-small);color:var(--negative);line-height:1.4}
+.machine-notice{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding:9px 11px;border:1px solid #5c4a25;border-radius:8px;background:#211b10;font-size:var(--fs-small);line-height:1.4;color:var(--muted)}
+.machine-notice .text-btn{color:var(--warning);white-space:nowrap;flex:0 0 auto}
+.machine-notice strong{color:var(--text);font-weight:500}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.field-full{grid-column:1/-1}
+.check{display:flex;align-items:center;gap:9px;min-height:var(--control-height);font-size:var(--fs-body);color:var(--text)}
+.check input{width:16px;height:16px;accent-color:var(--text);flex:none}
+.status{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:var(--radius-pill);font-size:var(--fs-small);font-weight:500;white-space:nowrap;flex:none}
+.status::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+.st-aberta{background:var(--warning-soft);color:var(--warning)}
+.st-em{background:var(--accent-soft);color:var(--accent)}
+.st-finalizada{background:var(--positive-soft);color:var(--positive)}
+.st-rejeitada{background:var(--raised-2);color:var(--muted)}
+
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:36px 28px}
+.login-shell{width:100%;max-width:1050px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);grid-template-areas:"intro card" "board card";gap:26px 44px;align-items:stretch}
+.login-intro{grid-area:intro}
+.wordmark{display:flex;align-items:center;gap:11px}
+.wordmark-copy{display:flex;flex-direction:column;gap:1px}
+.wordmark-copy strong{font-size:var(--fs-body);font-weight:600;letter-spacing:-.01em}
+.wordmark-copy span{font-size:var(--fs-small);color:var(--faint)}
+.login h1{font-size:var(--fs-lead);line-height:1.08;letter-spacing:-.03em;font-weight:600;max-width:15ch;margin-top:0;white-space:normal}
+.login-lead{margin-top:12px;max-width:44ch;color:var(--muted);font-size:var(--fs-body);line-height:1.55}
+.login-card{grid-area:card;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:24px}
+.login-brand{gap:13px;margin-bottom:18px}
+.login-brand .mark{width:38px;height:38px}
+.login-brand .wordmark-copy strong{font-size:var(--fs-title);letter-spacing:-.02em}
+.login-brand .wordmark-copy span{font-size:var(--fs-body)}
+.login-form-wrap{display:flex;flex-direction:column;justify-content:center;flex:1}
+.login-card h2{font-size:var(--fs-section);font-weight:600;letter-spacing:-.01em;margin-bottom:18px}
+.login-card .field{margin-bottom:12px}
+.login-submit{width:100%;margin-top:2px}
+.login-board{grid-area:board;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:20px}
+.board-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.board-head h2{font-size:var(--fs-section);font-weight:600;letter-spacing:-.01em}
+#loginLiveCount{font-size:var(--fs-small);color:var(--muted);white-space:nowrap}
+.live-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:1px 12px;padding:10px 4px;border-top:1px solid var(--rule)}
+.live-row strong{font-size:var(--fs-body);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-row small{grid-column:1;font-size:var(--fs-small);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-row em{grid-column:2;grid-row:1/3;align-self:center;font-style:normal;font-size:var(--fs-small);color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
+.login-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule);margin-top:12px}
+.login-stat{padding:12px 12px 0 0;min-width:0}
+.login-stat span{display:block;font-size:var(--fs-small);color:var(--faint);line-height:1.35}
+.login-stat strong{display:block;font-size:var(--fs-title);font-weight:400;margin-top:3px}
+.login-conn{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:var(--fs-small);color:var(--faint)}
+
+.app{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 16px;border-right:1px solid var(--rule);background:var(--ground)}
+.side-brand{display:flex;align-items:center;gap:10px;padding:0 8px 20px}
+.side-brand-copy{display:flex;flex-direction:column;gap:1px;min-width:0}
+.side-brand-copy strong{font-size:var(--fs-body);font-weight:600;letter-spacing:-.01em}
+.side-brand-copy span{font-size:var(--fs-small);color:var(--faint)}
+.side-nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;height:var(--nav-row);padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:var(--fs-body);text-align:left;white-space:nowrap;transition:background-color .15s ease,color .15s ease}
+.nav-item svg{width:16px;height:16px;flex:none}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{color:var(--text)}
+.nav-count{margin-left:auto;font-size:var(--fs-small);color:var(--faint);font-variant-numeric:tabular-nums}
+.nav-item.active .nav-count{color:var(--muted)}
+.side-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--rule);display:grid;gap:10px}
+.side-sync{display:flex;align-items:center;gap:8px;font-size:var(--fs-small);color:var(--muted)}
+#sideNote{font-size:var(--fs-small);color:var(--faint);line-height:1.4}
+.side-user{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.user-pill{display:flex;align-items:center;gap:9px;min-width:0}
+.user-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--raised-2);color:var(--text);font-size:var(--fs-small);font-weight:600;flex:none}
+.user-copy{min-width:0}
+.user-copy strong{display:block;font-size:var(--fs-body);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-copy small{display:block;font-size:var(--fs-small);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.work{min-width:0;display:flex;flex-direction:column;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:11px 28px;border-bottom:1px solid var(--rule);background:var(--ground)}
+.topbar-title{min-width:0;display:flex;flex-direction:column;gap:1px}
+.topbar-wordmark{display:none;font-size:var(--fs-small);font-weight:500;color:var(--faint);line-height:1.2}
+#screenTitle{font-size:var(--fs-title);font-weight:600;letter-spacing:-.02em;line-height:1.2;white-space:nowrap}
+.page-sub{max-width:72ch;font-size:var(--fs-small);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-actions{display:flex;align-items:center;gap:16px;flex:none}
+.freshness{font-size:var(--fs-small);color:var(--faint);white-space:nowrap}
+.topbar-sync{display:flex;align-items:center;gap:6px;font-size:var(--fs-small);color:var(--muted);white-space:nowrap}
+.page-actions{display:flex;align-items:center;gap:8px}
+.canvas{width:100%;max-width:1440px;margin:0 auto;padding:24px 28px 48px;flex:1}
+.view{display:block}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 28px 0;padding:9px 12px 9px 14px;border:1px solid var(--warning);border-radius:var(--radius-inner);background:var(--warning-soft);color:var(--warning);font-size:var(--fs-small)}
+.banner .btn{border-color:var(--warning);color:var(--warning)}
+.banner .btn:hover{background:transparent;border-color:var(--warning)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden}
+.kpi-cell{padding:14px 18px 16px;border-left:1px solid var(--rule);min-width:0}
+.kpi-cell:first-child{border-left:0}
+.kpi-label{display:block;font-size:var(--fs-small);color:var(--muted);line-height:1.35}
+.kpi-value{display:block;margin-top:3px;font-size:var(--fs-kpi);font-weight:400;line-height:1.2;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-value.lead{font-size:var(--fs-lead);font-weight:400}
+.kpi-value.accent{color:var(--accent)}
+.kpi-value.is-text{font-size:var(--fs-section);font-weight:500;padding-top:5px;line-height:1.3}
+.kpi-sub{display:block;margin-top:2px;font-size:var(--fs-small);color:var(--faint);line-height:1.35}
+.list-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden}
+.list-toolbar{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--rule);min-width:0}
+.tabs{display:flex;align-items:center;gap:2px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:var(--fs-small);white-space:nowrap;flex:none}
+.tab:hover{background:var(--raised);color:var(--text)}
+.tab.active{background:var(--raised);color:var(--text)}
+.tab-count{font-size:var(--fs-small);color:var(--faint);font-variant-numeric:tabular-nums}
+.tab.active .tab-count{color:var(--muted)}
+.search{display:flex;align-items:center;gap:8px;height:32px;min-width:230px;margin-left:auto;padding:0 12px;border:1px solid var(--control);border-radius:var(--radius-pill);background:var(--ground)}
+.search:focus-within{border-color:var(--faint)}
+.search svg{width:14px;height:14px;color:var(--faint);flex:none}
+.search input{width:100%;height:30px;padding:0;border:0;background:transparent;font-size:var(--fs-small);color:var(--text)}
+.search input:focus{outline:none}
+.list-head{display:grid;grid-template-columns:minmax(0,1fr) 96px 104px 112px 92px 96px;gap:12px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--rule);font-size:var(--fs-small);color:var(--faint)}
+.list-head .num{text-align:right}
+.wo-row{display:grid;grid-template-columns:minmax(0,1fr) 96px 104px 112px 92px 96px;gap:12px;align-items:center;min-height:64px;padding:11px 16px;border-bottom:1px solid var(--rule)}
+.wo-row:last-child{border-bottom:0}
+.wo-row:hover{background:var(--raised)}
+.wo-ident{display:flex;flex-direction:column;gap:3px;min-width:0;padding:0;border:0;background:transparent;color:var(--text);text-align:left}
+.wo-title{display:flex;align-items:baseline;gap:8px;min-width:0}
+.wo-num{font-size:var(--fs-body);font-weight:600;white-space:nowrap}
+.wo-machine{font-size:var(--fs-body);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wo-reason{font-size:var(--fs-small);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nq{color:var(--negative);white-space:nowrap}
+.wo-meta{display:contents}
+.wo-type{font-size:var(--fs-small);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wo-urg{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-small);color:var(--muted);white-space:nowrap}
+.wo-time{font-size:var(--fs-small);color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wo-act{display:flex;justify-content:flex-end}
+.wo-act .btn{height:30px;padding:0 12px;font-size:var(--fs-small)}
+.empty{padding:38px 20px;text-align:center}
+.empty h3{font-size:var(--fs-section);font-weight:500;color:var(--text)}
+.empty p{max-width:48ch;margin:5px auto 0;font-size:var(--fs-small);color:var(--faint);line-height:1.45}
+.empty .btn{margin-top:14px}
+.recent-panel{padding:0;margin-top:16px;overflow:hidden}
+.recent-panel .panel-head{margin:0;padding:13px 18px;border-bottom:1px solid var(--rule)}
+.recent-row{display:grid;grid-template-columns:70px minmax(0,1fr) 82px 100px;gap:12px;align-items:center;width:100%;padding:10px 18px;border:0;border-bottom:1px solid var(--rule);background:transparent;color:var(--text);text-align:left}
+.recent-row:last-child{border-bottom:0}
+.recent-row:hover{background:var(--raised)}
+.recent-id{font-size:var(--fs-body);font-weight:600;white-space:nowrap}
+.recent-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.recent-main strong{font-size:var(--fs-body);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-main span{font-size:var(--fs-small);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-repair{font-size:var(--fs-body);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.recent-when{font-size:var(--fs-small);color:var(--faint);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.dash-periods{display:none;margin-bottom:12px}
+.segmented{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-pill);padding:2px;background:var(--surface)}
+.segmented button{height:28px;padding:0 12px;border:0;border-radius:var(--radius-pill);background:transparent;color:var(--muted);font-size:var(--fs-small);white-space:nowrap}
+.segmented button:hover{color:var(--text)}
+.segmented button.active{background:var(--raised-2);color:var(--text)}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+.dash-right{display:grid;gap:16px}
+.dash-grid-wide{grid-template-columns:minmax(0,1fr) minmax(0,1.9fr)}
+.panel{min-width:0;padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface)}
+.panel-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;min-width:0}
+.panel-head h2{font-size:var(--fs-section);font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.panel-head>span{min-width:0;margin-left:auto;font-size:var(--fs-small);color:var(--faint);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.panel-head>.btn{margin-left:auto;flex:none}
+.panel-head>span+.btn{margin-left:8px}
+.panel-foot{margin-top:12px;font-size:var(--fs-small);color:var(--faint);line-height:1.45}
+.panel-desc{font-size:var(--fs-small);color:var(--muted);line-height:1.5;max-width:60ch}
+.pareto-list{display:grid;gap:10px}
+.pareto-row{display:grid;gap:5px}
+.pareto-line{display:grid;grid-template-columns:minmax(0,1fr) 28px 66px;gap:8px;align-items:baseline}
+.pareto-name{font-size:var(--fs-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pareto-count{font-size:var(--fs-small);text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
+.pareto-cum{font-size:var(--fs-small);text-align:right;color:var(--faint);font-variant-numeric:tabular-nums}
+.pareto-track{height:6px;border-radius:var(--radius-pill);background:var(--raised);overflow:hidden}
+.pareto-track i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--accent)}
+.insight{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 14px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--rule)}
+.insight strong{grid-row:1/3;font-size:var(--fs-lead);font-weight:400;line-height:1;letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums}
+.insight span{font-size:var(--fs-small);color:var(--faint);line-height:1.3}
+.insight p{margin:2px 0 0;font-size:var(--fs-small);color:var(--muted);line-height:1.4;max-width:34ch}
+.split-bar{display:flex;gap:2px;height:8px;margin-bottom:10px;border-radius:var(--radius-pill);overflow:hidden;background:var(--raised)}
+.split-bar i{display:block;height:100%}
+.split-row{display:grid;grid-template-columns:8px minmax(0,1fr) auto 46px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--rule)}
+.split-dot{width:8px;height:8px;border-radius:2px}
+.split-name{font-size:var(--fs-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.split-val{font-size:var(--fs-body);text-align:right;font-variant-numeric:tabular-nums}
+.split-pct{font-size:var(--fs-small);color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.machine-list{display:grid}
+.machine-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:6px 8px;align-items:center;padding:8px 0;border-top:1px solid var(--rule)}
+.machine-row:first-child{border-top:0}
+.machine-rank{font-size:var(--fs-small);color:var(--faint);font-variant-numeric:tabular-nums}
+.machine-name{font-size:var(--fs-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.machine-count{font-size:var(--fs-body);text-align:right;font-variant-numeric:tabular-nums}
+.machine-track{grid-column:2/4;height:4px;border-radius:var(--radius-pill);background:var(--raised);overflow:hidden}
+.machine-track i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--muted)}
+.machine-avg{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule)}
+.machine-avg-head{display:flex;justify-content:space-between;gap:12px;font-size:var(--fs-small);color:var(--faint);padding-bottom:4px}
+.machine-avg-row{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:var(--fs-small);color:var(--muted)}
+.machine-avg-row strong{font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
+.table-panel{padding:0;overflow:hidden}
+.table-panel .panel-head{margin:0;padding:14px 18px;border-bottom:1px solid var(--rule)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 12px;border-bottom:1px solid var(--rule);font-size:var(--fs-small);font-weight:400;color:var(--faint);text-align:left;white-space:nowrap}
+th.num,td.num{text-align:right}
+td{padding:10px 12px;border-bottom:1px solid var(--rule);font-size:var(--fs-small);color:var(--muted);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num{color:var(--text);font-variant-numeric:tabular-nums}
+td:first-child{color:var(--text)}
+.link-btn{padding:0;border:0;background:none;color:var(--text);font-size:var(--fs-small);font-weight:500}
+.link-btn:hover{text-decoration:underline;text-underline-offset:3px}
+.time-cards{display:none}
+
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.panel-wide{grid-column:1/-1}
+.admin-list{display:grid;margin-bottom:14px}
+.admin-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:9px 0;border-top:1px solid var(--rule)}
+.admin-row:first-child{border-top:0}
+.admin-ident{min-width:0}
+.admin-ident strong{display:block;font-size:var(--fs-body);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-ident span{display:block;font-size:var(--fs-small);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-actions{display:flex;align-items:center;gap:2px;flex:none}
+.conn-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px}
+.conn-side{display:flex;flex-direction:column;gap:14px;padding-left:24px;border-left:1px solid var(--rule)}
+.conn-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.joined{display:flex}
+.joined .input{flex:1;border-radius:var(--radius-inner) 0 0 var(--radius-inner)}
+.joined .btn{height:var(--control-height);border-radius:0 var(--radius-inner) var(--radius-inner) 0;border-left:0}
+.data-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.data-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid var(--rule)}
+.data-stat span{display:block;font-size:var(--fs-small);color:var(--faint)}
+.data-stat strong{display:block;margin-top:2px;font-size:var(--fs-section);font-weight:500}
+
+.dialog{width:min(580px,calc(100vw - 32px));max-height:min(88vh,760px);padding:0;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--surface);color:var(--text);box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.dialog::backdrop{background:rgba(0,0,0,.62)}
+.dialog-small{width:min(440px,calc(100vw - 32px))}
+.dialog form{display:flex;flex-direction:column;max-height:inherit}
+.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 20px 0}
+.dialog-head h2{font-size:var(--fs-title);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.dialog-head p{margin-top:3px;font-size:var(--fs-small);color:var(--faint)}
+.dialog-body{padding:16px 20px 4px;overflow:auto}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px 20px;border-top:1px solid var(--rule);margin-top:14px}
+.dialog-note{font-size:var(--fs-small);color:var(--faint);line-height:1.45;margin-top:10px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+.detail-item span{display:block;font-size:var(--fs-small);color:var(--faint)}
+.detail-item strong{display:block;margin-top:1px;font-size:var(--fs-body);font-weight:500}
+.detail-item .status{margin-top:2px}
+.detail-block{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule)}
+.detail-block h3{margin-bottom:4px;font-size:var(--fs-small);font-weight:500;color:var(--faint)}
+.detail-block p{font-size:var(--fs-body);line-height:1.55;color:var(--text);white-space:pre-wrap}
+.parts{margin-top:8px}
+.part-row{display:grid;grid-template-columns:minmax(0,1fr) 76px 34px;gap:8px;margin-bottom:8px}
+.part-row .input{height:34px}
+.part-remove{display:grid;place-items:center;width:34px;height:34px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--faint)}
+.part-remove:hover{background:var(--raised);color:var(--text)}
+.log{display:grid;gap:5px}
+.log-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:var(--fs-small);color:var(--muted)}
+.log-row strong{font-weight:500;color:var(--text)}
+.log-row time{color:var(--faint);white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:24px;z-index:80;max-width:calc(100vw - 32px);padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius-pill);background:var(--raised-2);color:var(--text);font-size:var(--fs-small);opacity:0;pointer-events:none;transform:translate(-50%,10px);transition:opacity .18s ease,transform .18s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.error{border-color:var(--negative);background:var(--negative-soft);color:var(--negative)}
+.mobile-nav{display:none}
+.only-mobile{display:none!important}
+
+@media (max-width:1100px){
+  .app{grid-template-columns:208px minmax(0,1fr)}
+  .canvas{padding:20px 22px 40px}
+  .topbar{padding:11px 22px}
+  .banner{margin:14px 22px 0}
+  .list-head,.wo-row{grid-template-columns:minmax(0,1fr) 84px 94px 104px 82px 84px;gap:10px}
+  .login{padding:30px 22px}
+}
+@media (max-width:960px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{display:none}
+  .topbar{min-height:58px;padding:8px 16px;gap:12px}
+  .topbar-wordmark{display:block}
+  #screenTitle{font-size:var(--fs-title)}
+  .canvas{padding:16px 16px 92px}
+  .banner{margin:12px 16px 0}
+  .mobile-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;height:calc(56px + env(safe-area-inset-bottom));padding:4px 8px env(safe-area-inset-bottom);border-top:1px solid var(--rule);background:var(--ground)}
+  .mobile-nav .nav-item{flex:1;flex-direction:column;justify-content:center;gap:2px;height:48px;padding:0 4px;font-size:var(--fs-small);border-radius:8px}
+  .mobile-nav .nav-item svg{width:18px;height:18px}
+  .mobile-nav .nav-count{display:none}
+  .only-desktop{display:none!important}
+  .only-mobile{display:inline-flex!important}
+  .login{min-height:100dvh;align-items:flex-start;padding:24px 16px 36px}
+  .login-shell{grid-template-columns:minmax(0,1fr);grid-template-areas:"intro" "card" "board";gap:20px;max-width:560px}
+  .login h1{margin-top:0}
+  .login-board{padding:16px}
+  .dash-grid,.dash-grid-wide{grid-template-columns:minmax(0,1fr)}
+  .dash-right{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin-grid{grid-template-columns:minmax(0,1fr)}
+  .conn-grid{grid-template-columns:minmax(0,1fr);gap:18px}
+  .conn-side{padding-left:0;padding-top:16px;border-left:0;border-top:1px solid var(--rule)}
+  .page-sub{max-width:54vw}
+}
+@media (max-width:760px){
+  .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi-cell:nth-child(odd){border-left:0}
+  .kpi-cell:nth-child(n+3){border-top:1px solid var(--rule)}
+  .kpi-value{font-size:var(--fs-title)}
+  .kpi-value.lead{font-size:var(--fs-kpi)}
+  .list-toolbar{flex-wrap:wrap;gap:10px;padding:10px 12px}
+  .tabs{width:100%;order:1}
+  .tab{padding:0 8px;gap:4px;font-size:12px}
+  .tab-count{font-size:12px}
+  .search{order:2;flex:1;min-width:0;margin-left:0}
+  .list-toolbar>.btn{order:3}
+  .list-head{display:none}
+  .wo-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"ident time" "meta act";gap:5px 10px;min-height:0;padding:12px 14px}
+  .wo-ident{grid-area:ident}
+  .wo-title{flex-wrap:wrap;gap:2px 8px}
+  .wo-reason{white-space:normal;line-height:1.4}
+  .wo-meta{display:flex;grid-area:meta;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+  .wo-type{display:none}
+  .wo-time{grid-area:time;align-self:start}
+  .wo-act{grid-area:act;align-self:end}
+  .recent-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"id repair" "main when";gap:2px 10px;padding:10px 14px}
+  .recent-id{grid-area:id}
+  .recent-main{grid-area:main}
+  .recent-repair{grid-area:repair;align-self:center}
+  .recent-when{grid-area:when;align-self:center}
+  .dash-right{grid-template-columns:minmax(0,1fr)}
+  .dash-periods{display:block}
+  .freshness{display:none}
+  .page-sub{display:none}
+  .panel{padding:14px}
+  .table-panel{padding:0}
+  .table-panel .panel-head{padding:12px 14px}
+  #tableSub{display:none}
+  .detail-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:minmax(0,1fr)}
+  .dialog-body{padding:14px 16px 4px}
+  .dialog-head{padding:16px 16px 0}
+  .dialog-actions{padding:14px 16px 16px}
+}
+@media (max-width:640px){
+  .time-cards{display:block;padding:0 14px 4px}
+  .table-wrap{display:none}
+  .time-card{padding:11px 0;border-bottom:1px solid var(--rule)}
+  .time-card:last-child{border-bottom:0}
+  .time-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .time-card-id{font-size:var(--fs-body);font-weight:500}
+  .time-card-machine{display:block;margin-top:1px;font-size:var(--fs-small);color:var(--faint)}
+  .time-card-times{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:7px}
+  .time-card-times span{font-size:var(--fs-small);color:var(--faint)}
+  .time-card-times strong{display:block;margin-top:1px;font-size:var(--fs-body);font-weight:400;color:var(--text)}
+  #syncText{display:none}
+  .topbar-actions{gap:10px}
+  .login-stats{grid-template-columns:minmax(0,1fr);gap:0}
+  .login-stat{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--rule)}
+  .login-stat:first-child{border-top:0}
+  .login-stat strong{font-size:var(--fs-section);margin-top:0}
+  .data-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:440px){
+  .login h1{font-size:26px}
+  .login{padding:20px 16px 32px}
+  .login-card{padding:20px}
+  .topbar{padding:8px 16px}
+  .canvas{padding:14px 16px 92px}
+  .topbar .btn{padding:0 12px}
+  .kpi-cell{padding:12px 14px}
+  .admin-actions .text-btn{padding:6px 5px}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div id="loginView" class="login">
+  <div class="login-shell">
+    <header class="login-intro">
+      <div id="loginTitleSlot"><h1 id="screenTitle">Maintenance requests</h1></div>
+      <p class="login-lead">Open a WO when a machine stops. Maintenance takes the request, logs the parts and closes the repair.</p>
+    </header>
+
+    <section class="login-card" aria-labelledby="loginHeading">
+      <div class="wordmark login-brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M16 3.5 27 9.8v12.4L16 28.5 5 22.2V9.8L16 3.5Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M10.5 19.5h4.3l2.2-4.6 2.5 7.1 1.8-3.7h2.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="wordmark-copy"><strong>Workshop</strong><span>Maintenance · Factory floor</span></span>
+      </div>
+      <div class="login-form-wrap">
+        <h2 id="loginHeading">Sign in</h2>
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="loginUser">Username</label>
+            <input id="loginUser" class="input" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+          </div>
+          <div class="field">
+            <label for="loginPass">Password</label>
+            <input id="loginPass" class="input" name="senha" type="password" autocomplete="current-password" required>
+          </div>
+          <p id="loginError" class="form-error" role="alert"></p>
+          <button class="btn btn-primary login-submit" type="submit">Sign in</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="login-board" aria-labelledby="boardHeading">
+      <div class="board-head">
+        <h2 id="boardHeading">On the factory floor now</h2>
+        <span id="loginLiveCount">0 in progress</span>
+      </div>
+      <div id="loginLiveList"></div>
+      <div id="loginStats" class="login-stats"></div>
+      <div class="login-conn"><span id="loginConnDot" class="dot amber"></span><span id="loginConnText">Local mode</span></div>
+    </section>
+  </div>
+</div>
+
+<div id="appShell" class="app hidden">
+  <aside class="sidebar">
+    <div class="side-brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M16 3.5 27 9.8v12.4L16 28.5 5 22.2V9.8L16 3.5Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M10.5 19.5h4.3l2.2-4.6 2.5 7.1 1.8-3.7h2.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="side-brand-copy"><strong>Workshop</strong><span>Maintenance · Factory</span></div>
+    </div>
+    <nav id="sideNav" class="side-nav" aria-label="Main navigation"></nav>
+    <div class="side-foot">
+      <div class="side-sync"><span id="sideSyncDot" class="dot amber"></span><span id="sideSyncText">Local mode</span></div>
+      <p id="sideNote"></p>
+      <div class="side-user">
+        <div id="userPill" class="user-pill"></div>
+        <button id="logoutBtn" class="icon-btn" type="button" aria-label="Sign out" title="Sign out">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span class="topbar-wordmark">Workshop</span>
+        <div id="titleSlot"></div>
+        <p id="pageSubtitle" class="page-sub"></p>
+      </div>
+      <div class="topbar-actions">
+        <span id="freshness" class="freshness"></span>
+        <div id="pageActions" class="page-actions"></div>
+        <div class="topbar-sync" title="Connection status"><span id="syncDot" class="dot amber"></span><span id="syncText">Local mode</span></div>
+      </div>
+    </header>
+
+    <div id="syncBanner" class="banner hidden" role="status">
+      <span id="syncBannerText"></span>
+      <button class="btn btn-secondary btn-sm" type="button" data-action="sync">Try again</button>
+    </div>
+
+    <main id="main" class="canvas">
+      <section id="viewChamados" class="view">
+        <div id="chamadosKpis" class="kpi-row"></div>
+        <section class="list-panel" aria-label="Work order list">
+          <div class="list-toolbar">
+            <div id="woTabs" class="tabs" role="tablist" aria-label="Filter requests">
+              <button class="tab active" type="button" role="tab" aria-selected="true" data-filter="andamento">In Progress <span class="tab-count" data-count="andamento">0</span></button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-filter="abertas">Open <span class="tab-count" data-count="abertas">0</span></button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-filter="finalizadas">Finished <span class="tab-count" data-count="finalizadas">0</span></button>
+              <button class="tab" type="button" role="tab" aria-selected="false" data-filter="todas">All <span class="tab-count" data-count="todas">0</span></button>
+            </div>
+            <label class="search" for="woSearch">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <input id="woSearch" type="search" placeholder="Search WO, machine or reason" autocomplete="off">
+            </label>
+            <button class="btn btn-primary only-desktop" type="button" data-action="new-wo">Open WO</button>
+          </div>
+          <div class="list-head" aria-hidden="true">
+            <span>WO</span><span>Type</span><span>Urgency</span><span>Status</span><span class="num">Time</span><span></span>
+          </div>
+          <div id="woList" class="wo-list"></div>
+        </section>
+        <section id="recentPanel" class="panel recent-panel" aria-label="Recent repairs">
+          <div class="panel-head"><h2>Recent repairs</h2><span id="recentCount"></span></div>
+          <div id="recentRepairs" class="recent-list"></div>
+        </section>
+      </section>
+
+      <section id="viewDashboard" class="view hidden">
+        <div id="dashPeriods" class="dash-periods"></div>
+        <div id="dashKpis" class="kpi-row"></div>
+        <div class="dash-grid">
+          <section class="panel">
+            <div class="panel-head"><h2>Reason Pareto</h2><span>Share and cumulative</span></div>
+            <div id="paretoList" class="pareto-list"></div>
+            <div id="paretoInsight" class="insight"></div>
+            <p id="paretoFoot" class="panel-foot"></p>
+          </section>
+          <div class="dash-right">
+            <section class="panel">
+              <div class="panel-head"><h2>Urgency</h2><span>Set by production</span></div>
+              <div id="urgencyList" class="split-list"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head"><h2>Maintenance type</h2><span>Distribution</span></div>
+              <div id="typeList" class="split-list"></div>
+            </section>
+          </div>
+        </div>
+        <div class="dash-grid dash-grid-wide">
+          <section class="panel">
+            <div class="panel-head"><h2>Machines with most requests</h2><span>Top 5</span></div>
+            <div id="machineList" class="machine-list"></div>
+            <p id="machineFoot" class="panel-foot"></p>
+            <div id="machineAvg" class="machine-avg"></div>
+          </section>
+          <section class="panel table-panel">
+            <div class="panel-head"><h2>Time by WO</h2><span id="tableSub"></span><button class="btn btn-secondary btn-sm only-desktop" type="button" data-action="export-csv">Export CSV</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">WO</th><th scope="col">Machine</th><th scope="col">Type</th><th scope="col" class="num">Wait</th><th scope="col" class="num">Repair</th><th scope="col" class="num">Total</th><th scope="col">Status</th></tr></thead>
+                <tbody id="woTableBody"></tbody>
+              </table>
+            </div>
+            <div id="timeCards" class="time-cards"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="viewGestao" class="view hidden">
+        <div class="admin-grid">
+          <section class="panel">
+            <div class="panel-head"><h2>Machines</h2><span id="machineAdminSub"></span></div>
+            <div id="machineAdminList" class="admin-list"></div>
+            <button class="btn btn-secondary btn-sm" type="button" data-action="add-machine">Add machine</button>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Downtime reasons</h2><span id="reasonAdminSub"></span></div>
+            <div id="reasonAdminList" class="admin-list"></div>
+            <button class="btn btn-secondary btn-sm" type="button" data-action="add-reason">Add reason</button>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Users</h2><span id="userAdminSub"></span></div>
+            <div id="userAdminList" class="admin-list"></div>
+            <button class="btn btn-secondary btn-sm" type="button" data-action="add-user">Add user</button>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Data</h2><span>Backup and catalog</span></div>
+            <p class="panel-desc">Export WO to CSV or import machines and reasons from a spreadsheet.</p>
+            <div class="data-actions">
+              <button class="btn btn-secondary" type="button" data-action="export-csv">Export WO</button>
+              <button class="btn btn-secondary" type="button" data-action="import-csv">Import catalog</button>
+            </div>
+            <div id="dataStats" class="data-stats"></div>
+            <p class="panel-foot">The CSV uses semicolons and UTF-8, so it opens directly in Excel. Demo passwords are stored as plain text in the database.</p>
+          </section>
+          <section class="panel panel-wide">
+            <div class="panel-head"><h2>Connection</h2><span id="connStatus"></span></div>
+            <div class="conn-grid">
+              <form id="firebaseForm" novalidate>
+                <div class="field">
+                  <label for="firebaseUrl">Realtime Database URL</label>
+                  <p class="field-desc">Paste your project URL, such as https://workshop-abc-default-rtdb.firebaseio.com. It is saved only in this browser.</p>
+                  <div class="joined">
+                    <input id="firebaseUrl" class="input" type="url" placeholder="https://your-project.firebaseio.com" autocomplete="off" spellcheck="false">
+                    <button class="btn btn-secondary" type="submit">Connect</button>
+                  </div>
+                  <p id="firebaseError" class="form-error" role="alert"></p>
+                </div>
+              </form>
+              <div class="conn-side">
+                <p class="panel-desc">Without Firebase, the app saves in this browser. With Firebase, production and maintenance see the same queue on any device.</p>
+                <div class="conn-actions">
+                  <button id="disconnectBtn" class="text-btn danger" type="button" data-action="disconnect">Disconnect</button>
+                  <button id="pushAllRow" class="text-btn" type="button" data-action="push-all">Send local data to Firebase</button>
+                  <button id="restoreSeedRow" class="text-btn" type="button" data-action="restore-seed">Restore demo</button>
+                  <button id="clearDataRow" class="text-btn danger" type="button" data-action="clear-data">Clear all data</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <nav id="mobileNav" class="mobile-nav" aria-label="Main navigation"></nav>
+  </div>
+</div>
+
+<dialog id="appDialog" class="dialog" aria-labelledby="dialogTitle">
+  <form id="dialogForm" novalidate>
+    <div class="dialog-head">
+      <div><h2 id="dialogTitle"></h2><p id="dialogSub"></p></div>
+      <button class="icon-btn" type="button" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="dialogBody" class="dialog-body"></div>
+    <div id="dialogActions" class="dialog-actions"></div>
+  </form>
+</dialog>
+
+<dialog id="confirmDialog" class="dialog dialog-small" aria-labelledby="confirmTitle">
+  <div class="dialog-head">
+    <div><h2 id="confirmTitle"></h2></div>
+    <button class="icon-btn" type="button" data-confirm-close aria-label="Close">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="dialog-body"><p id="confirmMessage" class="panel-desc"></p></div>
+  <div class="dialog-actions">
+    <button id="confirmCancel" class="btn btn-secondary" type="button">Cancel</button>
+    <button id="confirmOk" class="btn btn-primary" type="button">Confirm</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const LS = {
+  state: "workshop.cmms.v2.state",
+  fb: "workshop.cmms.v2.firebaseUrl",
+  session: "workshop.cmms.v2.session"
+};
+
+const STATUS = {
+  open: { label: "Open", cls: "st-aberta", rank: 0 },
+  in_progress: { label: "In Progress", cls: "st-em", rank: 1 },
+  finished: { label: "Finished", cls: "st-finalizada", rank: 2 },
+  rejected: { label: "Rejected", cls: "st-rejeitada", rank: 3 }
+};
+
+const TYPE = {
+  corrective: { label: "Corrective" },
+  predictive: { label: "Predictive" },
+  preventive: { label: "Preventive" }
+};
+
+const URG = {
+  high: { label: "High", cls: "urg-alta", rank: 0 },
+  medium: { label: "Medium", cls: "urg-media", rank: 1 },
+  low: { label: "Low", cls: "urg-baixa", rank: 2 }
+};
+
+const ROLE = {
+  production: "Production",
+  maintenance: "Maintenance",
+  admin: "Administrator"
+};
+
+const icon = (body) => `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${body}</svg>`;
+const ICONS = {
+  chamados: icon('<path d="M9 6h12M9 12h12M9 18h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3.2 6h.01M3.2 12h.01M3.2 18h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'),
+  dashboard: icon('<path d="M3 20h18M6 20v-7M11 20V4M16 20v-9M21 20V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'),
+  gestao: icon('<path d="M4 7h8M16 7h4M4 17h4M12 17h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="14" cy="7" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="17" r="2" stroke="currentColor" stroke-width="1.6"/>'),
+  plus: icon('<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'),
+  refresh: icon('<path d="M20 11a8 8 0 1 0-.7 4.4M20 4v5h-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'),
+  logout: icon('<path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>')
+};
+
+const runtime = {
+  screen: "chamados",
+  filter: "andamento",
+  q: "",
+  dashPeriod: 30,
+  fbUrl: "",
+  mode: "local",
+  connected: false,
+  offline: false,
+  syncing: false,
+  syncError: false,
+  bannerMode: "",
+  freshAt: 0,
+  dialogMode: "",
+  confirmAction: null
+};
+
+let state = emptyState();
+let session = null;
+let realtime = null;
+let pollTimer = 0;
+let remoteTimer = 0;
+let toastTimer = 0;
+let tickTimer = 0;
+
+function emptyState() {
+  return { workOrders: {}, machines: {}, breakReasons: {}, users: {}, meta: { seq: 0 } };
+}
+
+function $(selector, root) {
+  return (root || document).querySelector(selector);
+}
+
+function $$(selector, root) {
+  return Array.from((root || document).querySelectorAll(selector));
+}
+
+function esc(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
+function norm(value) {
+  return String(value == null ? "" : value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function slug(value) {
+  const base = norm(value).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 44);
+  return base || `item-${Date.now().toString(36)}`;
+}
+
+function initials(login) {
+  const parts = String(login || "").replace(/[^a-zA-Z0-9 ]/g, " ").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function nowISO() {
+  return new Date().toISOString();
+}
+
+function dateOf(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function sameDay(value, reference) {
+  const date = dateOf(value);
+  if (!date) return false;
+  const ref = reference || new Date();
+  return date.getFullYear() === ref.getFullYear() && date.getMonth() === ref.getMonth() && date.getDate() === ref.getDate();
+}
+
+function dt(value) {
+  const date = dateOf(value);
+  if (!date) return "-";
+  return date.toLocaleString("en-US", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).replace(",", "");
+}
+
+function hm(value) {
+  const date = dateOf(value);
+  if (!date) return "-";
+  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+}
+
+function dur(ms) {
+  const total = Math.max(0, Math.round(Number(ms) || 0));
+  const mins = Math.floor(total / 60000);
+  if (mins < 60) return `${mins}min`;
+  if (mins < 1440) {
+    const hours = Math.floor(mins / 60);
+    const rest = mins % 60;
+    return rest ? `${hours}h ${rest}min` : `${hours}h`;
+  }
+  const days = Math.floor(mins / 1440);
+  const hours = Math.floor((mins % 1440) / 60);
+  return hours ? `${days}d ${hours}h` : `${days}d`;
+}
+
+function minutesValue(ms) {
+  return String(Math.max(0, Math.round((Number(ms) || 0) / 60000)));
+}
+
+function byCreatedDesc(a, b) {
+  return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
+}
+
+function urgencyRank(order) {
+  return URG[order && order.urgencia] ? URG[order.urgencia].rank : 9;
+}
+
+function activeOrders() {
+  return Object.values(state.workOrders).filter((order) => order.status === "open" || order.status === "in_progress");
+}
+
+function activeOrderForMachine(machineId) {
+  return activeOrders()
+    .filter((order) => order.machineId === machineId)
+    .sort((a, b) => new Date(a.criadoEm || 0) - new Date(b.criadoEm || 0))[0] || null;
+}
+
+function sortedActive() {
+  return activeOrders().sort((a, b) => urgencyRank(a) - urgencyRank(b) || new Date(a.criadoEm || 0) - new Date(b.criadoEm || 0));
+}
+
+function waitMs(order) {
+  const created = dateOf(order.criadoEm);
+  if (!created) return 0;
+  const started = dateOf(order.iniciadoEm);
+  if (started) return Math.max(0, started - created);
+  const ended = dateOf(order.finalizadoEm) || dateOf(order.rejeitadoEm);
+  if (ended) return Math.max(0, ended - created);
+  return Math.max(0, Date.now() - created);
+}
+
+function repairMs(order) {
+  const started = dateOf(order.iniciadoEm);
+  if (!started) return 0;
+  const ended = dateOf(order.finalizadoEm) || dateOf(order.rejeitadoEm) || (order.status === "in_progress" ? new Date() : null);
+  if (!ended) return 0;
+  return Math.max(0, ended - started);
+}
+
+function totalMs(order) {
+  const created = dateOf(order.criadoEm);
+  if (!created) return 0;
+  const ended = dateOf(order.finalizadoEm) || dateOf(order.rejeitadoEm) || new Date();
+  return Math.max(0, ended - created);
+}
+
+function timeLabel(order) {
+  if (order.status === "open") {
+    const created = dateOf(order.criadoEm);
+    return dur(created ? Date.now() - created : 0);
+  }
+  if (order.status === "in_progress") {
+    const started = dateOf(order.iniciadoEm);
+    return dur(started ? Date.now() - started : 0);
+  }
+  if (order.status === "finished") return repairMs(order) ? dur(repairMs(order)) : "-";
+  return totalMs(order) ? dur(totalMs(order)) : "-";
+}
+
+function timeTitle(order) {
+  if (order.status === "open") return `Waiting ${timeLabel(order)}`;
+  if (order.status === "in_progress") return `In progress for ${timeLabel(order)}`;
+  if (order.status === "finished") return `Repair took ${timeLabel(order)}`;
+  return `Request rejected after ${timeLabel(order)}`;
+}
+
+function machineName(id) {
+  return state.machines[id] ? state.machines[id].nome : (id || "-");
+}
+
+function reasonName(id) {
+  return state.breakReasons[id] ? state.breakReasons[id].nome : (id || "-");
+}
+
+function csvReason(order) {
+  const id = String(order.motivoId || "").trim();
+  if (!id) return "N/A";
+  const reason = state.breakReasons[id];
+  if (reason && reason.nome) return reason.nome;
+  const wanted = norm(id);
+  const match = Object.values(state.breakReasons).find((item) => norm(item.id) === wanted || norm(item.nome) === wanted);
+  return match ? match.nome : "N/A";
+}
+
+function seedCatalog() {
+  return {
+    machines: {
+      "winder-1": { id: "winder-1", nome: "Winder 1" },
+      "winder-2": { id: "winder-2", nome: "Winder 2" },
+      "press-1": { id: "press-1", nome: "Press 1" },
+      "extruder-1": { id: "extruder-1", nome: "Extruder 1" },
+      "coiler-1": { id: "coiler-1", nome: "Coiler 1" }
+    },
+    breakReasons: {
+      "collision": { id: "collision", nome: "Collision" },
+      "breakdown": { id: "breakdown", nome: "Breakdown" },
+      "machine-wont-start": { id: "machine-wont-start", nome: "Machine won't start" },
+      "system-down": { id: "system-down", nome: "System down" },
+      "coil-problem": { id: "coil-problem", nome: "Coil problem" }
+    },
+    users: {
+      production: { login: "production", senha: "production123", papel: "production" },
+      maintenance: { login: "maintenance", senha: "maintenance123", papel: "maintenance" },
+      admin: { login: "admin", senha: "admin123", papel: "admin" }
+    }
+  };
+}
+
+function seedState() {
+  const catalog = seedCatalog();
+  const now = Date.now();
+  const ago = (mins) => new Date(now - mins * 60000).toISOString();
+
+  const makeOrder = (number, data) => {
+    const numero = `WO-${String(number).padStart(4, "0")}`;
+    const criadoEm = ago(data.createdMin);
+    const order = {
+      numero,
+      machineId: data.machine,
+      tipo: data.tipo,
+      motivoId: data.reason,
+      urgencia: data.urg,
+      naoQualidade: !!data.nq,
+      descricao: data.desc || "",
+      status: data.status,
+      criadoEm,
+      criadoPor: data.by || "production",
+      iniciadoEm: null,
+      iniciadoPor: "",
+      finalizadoEm: null,
+      finalizadoPor: "",
+      rejeitadoEm: null,
+      rejeitadoPor: "",
+      motivoRejeicao: "",
+      diagnostico: data.diag || "",
+      oQueFoiArrumado: data.fix || "",
+      pecasUtilizadas: data.parts || [],
+      statusLog: [{ status: "open", em: criadoEm, por: data.by || "production" }]
+    };
+    if (data.startedMin != null) {
+      order.iniciadoEm = ago(data.startedMin);
+      order.iniciadoPor = "maintenance";
+      order.statusLog.push({ status: "in_progress", em: order.iniciadoEm, por: "maintenance" });
+    }
+    if (data.finishedMin != null) {
+      order.finalizadoEm = ago(data.finishedMin);
+      order.finalizadoPor = "maintenance";
+      order.statusLog.push({ status: "finished", em: order.finalizadoEm, por: "maintenance" });
+    }
+    if (data.rejectedMin != null) {
+      order.rejeitadoEm = ago(data.rejectedMin);
+      order.rejeitadoPor = "maintenance";
+      order.motivoRejeicao = data.rejectReason || "";
+      order.statusLog.push({ status: "rejected", em: order.rejeitadoEm, por: "maintenance" });
+    }
+    return [numero, order];
+  };
+
+  const orders = Object.fromEntries([
+    makeOrder(1, { machine: "winder-1", tipo: "corrective", reason: "collision", urg: "high", nq: true, status: "finished", createdMin: 7440, startedMin: 7260, finishedMin: 7170, desc: "The coil hit the guide and the line stopped. The operator heard a snap before the stop.", diag: "Drive shaft bearing seized and belt out of alignment.", fix: "Bearing and belt replaced. Shaft aligned and line released for the shift.", parts: [{ nome: "Bearing 6204", qtd: 2 }, { nome: "Belt A-42", qtd: 1 }] }),
+    makeOrder(2, { machine: "press-1", tipo: "preventive", reason: "breakdown", urg: "low", status: "finished", createdMin: 6480, startedMin: 6420, finishedMin: 6360, desc: "Scheduled stop to inspect the brakes and guard.", diag: "Brake play above the limit and guard sensor misaligned.", fix: "Brake adjusted, sensor repositioned and safety test performed.", parts: [] }),
+    makeOrder(3, { machine: "extruder-1", tipo: "corrective", reason: "breakdown", urg: "medium", status: "finished", createdMin: 5520, startedMin: 5400, finishedMin: 5340, desc: "The extruder lost torque and material started running out of spec.", diag: "Motor coupling with worn teeth.", fix: "Coupling replaced and torque checked unloaded and under load.", parts: [{ nome: "Flexible coupling", qtd: 1 }] }),
+    makeOrder(4, { machine: "winder-2", tipo: "corrective", reason: "machine-wont-start", urg: "high", nq: true, status: "finished", createdMin: 3360, startedMin: 3300, finishedMin: 3195, desc: "Panel unresponsive after shift change. No alarm was shown.", diag: "Burnt inductive sensor kept the panel in safety fault.", fix: "Sensor replaced, panel restarted and start tested three times.", parts: [{ nome: "M12 inductive sensor", qtd: 1 }] }),
+    makeOrder(5, { machine: "coiler-1", tipo: "predictive", reason: "coil-problem", urg: "medium", status: "finished", createdMin: 2640, startedMin: 2580, finishedMin: 2535, desc: "Above-normal vibration on the coil shaft, noticed during the walkaround.", diag: "Wear on the rear bearing, not yet a total failure.", fix: "Bearing replaced and vibration measured again within range.", parts: [{ nome: "Bearing 6205", qtd: 1 }] }),
+    makeOrder(6, { machine: "winder-1", tipo: "corrective", reason: "collision", urg: "medium", nq: true, status: "rejected", createdMin: 4440, rejectedMin: 4300, desc: "Another collision logged on the same machine as WO-0001.", rejectReason: "Duplicate of WO-0001. The machine had already been released and tested by the same shift." }),
+    makeOrder(7, { machine: "press-1", tipo: "corrective", reason: "system-down", urg: "high", status: "finished", createdMin: 1320, startedMin: 1290, finishedMin: 1230, desc: "The supervisory system went down and the press lost control.", diag: "Unstable 24 V supply with voltage drop in the rack.", fix: "Power supply replaced and 24 V network measured point to point.", parts: [{ nome: "24V 5A power supply", qtd: 1 }] }),
+    makeOrder(8, { machine: "extruder-1", tipo: "preventive", reason: "coil-problem", urg: "low", status: "finished", createdMin: 600, startedMin: 570, finishedMin: 525, desc: "Preventive inspection of the puller and output coil.", diag: "Guide with play and dry roller.", fix: "Guide adjusted and roller lubricated. No parts replaced.", parts: [] }),
+    makeOrder(9, { machine: "winder-2", tipo: "corrective", reason: "machine-wont-start", urg: "high", nq: true, status: "open", createdMin: 135, desc: "The machine won't start. The panel lights up, but the control does not respond." }),
+    makeOrder(10, { machine: "winder-1", tipo: "corrective", reason: "collision", urg: "medium", status: "in_progress", createdMin: 48, startedMin: 40, desc: "Collision at the infeed guide. The line is stopped and waiting for release." })
+  ]);
+
+  return {
+    workOrders: orders,
+    machines: catalog.machines,
+    breakReasons: catalog.breakReasons,
+    users: catalog.users,
+    meta: { seq: 10, updatedAt: ago(0) }
+  };
+}
+
+function toObject(value) {
+  if (!value || typeof value !== "object") return {};
+  if (Array.isArray(value)) {
+    const out = {};
+    value.forEach((item, index) => {
+      if (!item || typeof item !== "object") return;
+      const key = item.numero || item.id || item.login || String(index);
+      out[key] = item;
+    });
+    return out;
+  }
+  return value;
+}
+
+function normalizeState(base) {
+  const source = base && typeof base === "object" ? base : {};
+  const out = emptyState();
+  out.workOrders = toObject(source.workOrders);
+  out.machines = toObject(source.machines);
+  out.breakReasons = toObject(source.breakReasons);
+  out.users = toObject(source.users);
+  out.meta = source.meta && typeof source.meta === "object" ? { ...source.meta } : { seq: 0 };
+
+  out.workOrders = Object.fromEntries(Object.entries(out.workOrders).map(([key, raw]) => {
+    const order = raw && typeof raw === "object" ? { ...raw } : {};
+    order.numero = order.numero || key;
+    order.machineId = String(order.machineId || "");
+    order.motivoId = String(order.motivoId || "");
+    order.urgencia = URG[order.urgencia] ? order.urgencia : "medium";
+    order.tipo = TYPE[order.tipo] ? order.tipo : "corrective";
+    order.status = STATUS[order.status] ? order.status : "open";
+    order.naoQualidade = !!order.naoQualidade;
+    order.descricao = String(order.descricao || "");
+    order.diagnostico = String(order.diagnostico || "");
+    order.oQueFoiArrumado = String(order.oQueFoiArrumado || "");
+    order.motivoRejeicao = String(order.motivoRejeicao || "");
+    const rawParts = Array.isArray(order.pecasUtilizadas) ? order.pecasUtilizadas : (order.pecasUtilizadas && typeof order.pecasUtilizadas === "object" ? Object.values(order.pecasUtilizadas) : []);
+    order.pecasUtilizadas = rawParts.map((part) => ({ nome: String(part && part.nome ? part.nome : ""), qtd: Number(part && part.qtd ? part.qtd : 1) || 1 })).filter((part) => part.nome);
+    const rawLog = Array.isArray(order.statusLog) ? order.statusLog : (order.statusLog && typeof order.statusLog === "object" ? Object.values(order.statusLog) : []);
+    order.statusLog = rawLog.filter((row) => row && STATUS[row.status]).map((row) => ({ status: row.status, em: String(row.em || ""), por: String(row.por || "") }));
+    if (!order.statusLog.length) {
+      if (order.criadoEm) order.statusLog.push({ status: "open", em: order.criadoEm, por: order.criadoPor || "" });
+      if (order.iniciadoEm) order.statusLog.push({ status: "in_progress", em: order.iniciadoEm, por: order.iniciadoPor || "" });
+      if (order.finalizadoEm) order.statusLog.push({ status: "finished", em: order.finalizadoEm, por: order.finalizadoPor || "" });
+      if (order.rejeitadoEm) order.statusLog.push({ status: "rejected", em: order.rejeitadoEm, por: order.rejeitadoPor || "" });
+    }
+    return [order.numero, order];
+  }));
+
+  out.machines = Object.fromEntries(Object.entries(out.machines).map(([key, raw]) => {
+    const machine = raw && typeof raw === "object" ? raw : {};
+    return [String(machine.id || key), { id: String(machine.id || key), nome: String(machine.nome || machine.name || key) }];
+  }));
+
+  out.breakReasons = Object.fromEntries(Object.entries(out.breakReasons).map(([key, raw]) => {
+    const reason = raw && typeof raw === "object" ? raw : {};
+    return [String(reason.id || key), { id: String(reason.id || key), nome: String(reason.nome || reason.name || key) }];
+  }));
+
+  out.users = Object.fromEntries(Object.entries(out.users).map(([key, raw]) => {
+    const user = raw && typeof raw === "object" ? raw : {};
+    const login = String(user.login || key);
+    return [login, { login, senha: String(user.senha || ""), papel: ROLE[user.papel] ? user.papel : "production" }];
+  }));
+
+  const maxSeq = Object.keys(out.workOrders).reduce((max, numero) => {
+    const match = /^WO-(\d+)$/.exec(numero);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  out.meta.seq = Math.max(Number(out.meta.seq) || 0, maxSeq);
+  return out;
+}
+
+function replaceState(next) {
+  state = normalizeState(next);
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LS.state);
+    if (!raw) return null;
+    return normalizeState(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+function saveLocal() {
+  try {
+    localStorage.setItem(LS.state, JSON.stringify(state));
+  } catch {}
+}
+
+function getFbUrl() {
+  try {
+    return (localStorage.getItem(LS.fb) || "").trim().replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function setFbUrl(url) {
+  try {
+    localStorage.setItem(LS.fb, url);
+  } catch {}
+}
+
+function clearFbUrl() {
+  try {
+    localStorage.removeItem(LS.fb);
+  } catch {}
+}
+
+function validFbUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return false;
+    return /\.firebaseio\.com$/.test(url.hostname) || /\.firebasedatabase\.app$/.test(url.hostname);
+  } catch {
+    return false;
+  }
+}
+async function fbRequest(path, options = {}) {
+  const base = runtime.fbUrl || getFbUrl();
+  if (!base) throw new Error("Firebase not configured.");
+  const clean = String(path || "").replace(/^\/+|\/+$/g, "");
+  const url = `${base}/${clean ? clean.split("/").map(encodeURIComponent).join("/") : ""}.json`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeout || 9000);
+  try {
+    const response = await fetch(url, {
+      method: options.method || "GET",
+      headers: options.body !== undefined ? { "Content-Type": "application/json" } : undefined,
+      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      signal: controller.signal,
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fbPut(path, value) {
+  return fbRequest(path, { method: "PUT", body: value });
+}
+
+async function fbDelete(path) {
+  return fbRequest(path, { method: "DELETE" });
+}
+
+async function testFirebaseUrl(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 9000);
+  try {
+    const response = await fetch(`${url}/.json?shallow=true`, { signal: controller.signal, cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    await response.text();
+    return true;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function bootData() {
+  runtime.fbUrl = getFbUrl();
+  if (runtime.fbUrl) {
+    runtime.mode = "firebase";
+    runtime.syncing = true;
+    try {
+      const raw = await fbRequest("", { timeout: 9000 });
+      const next = normalizeState(raw || {});
+      const catalog = seedCatalog();
+      const writes = [];
+      if (!Object.keys(next.machines).length) {
+        next.machines = catalog.machines;
+        writes.push(["machines", next.machines]);
+      }
+      if (!Object.keys(next.breakReasons).length) {
+        next.breakReasons = catalog.breakReasons;
+        writes.push(["breakReasons", next.breakReasons]);
+      }
+      if (!Object.keys(next.users).length) {
+        next.users = catalog.users;
+        writes.push(["users", next.users]);
+      }
+      if (!next.meta.seq) {
+        next.meta.seq = Object.keys(next.workOrders).reduce((max, numero) => {
+          const match = /^WO-(\d+)$/.exec(numero);
+          return match ? Math.max(max, Number(match[1])) : max;
+        }, 0);
+        writes.push(["meta", next.meta]);
+      }
+      replaceState(next);
+      saveLocal();
+      for (const [path, value] of writes) await fbPut(path, value);
+      runtime.connected = true;
+      runtime.offline = false;
+      runtime.syncError = false;
+      runtime.bannerMode = "";
+      runtime.freshAt = Date.now();
+      startRealtime();
+    } catch {
+      runtime.connected = false;
+      runtime.offline = true;
+      runtime.syncError = true;
+      runtime.bannerMode = "connect";
+      replaceState(loadLocal() || seedState());
+      saveLocal();
+    } finally {
+      runtime.syncing = false;
+    }
+  } else {
+    runtime.mode = "local";
+    runtime.connected = false;
+    runtime.offline = false;
+    runtime.syncError = false;
+    runtime.bannerMode = "";
+    replaceState(loadLocal() || seedState());
+    saveLocal();
+    runtime.freshAt = Date.now();
+  }
+}
+
+function startRealtime() {
+  if (!runtime.fbUrl) return;
+  if (realtime) {
+    try {
+      realtime.close();
+    } catch {}
+  }
+  if (typeof EventSource === "function") {
+    try {
+      realtime = new EventSource(`${runtime.fbUrl}/.json`);
+      realtime.onopen = () => {
+        runtime.connected = true;
+        renderSync();
+      };
+      realtime.onmessage = () => scheduleRemoteRefresh();
+      realtime.onerror = () => {
+        runtime.connected = false;
+        renderSync();
+      };
+    } catch {
+      realtime = null;
+    }
+  }
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => {
+    if (runtime.fbUrl && document.visibilityState === "visible") remoteRefresh(true);
+  }, 45000);
+}
+
+function stopRealtime() {
+  if (realtime) {
+    try {
+      realtime.close();
+    } catch {}
+    realtime = null;
+  }
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = 0;
+  }
+}
+
+function scheduleRemoteRefresh() {
+  if (remoteTimer) clearTimeout(remoteTimer);
+  remoteTimer = setTimeout(() => remoteRefresh(true), 800);
+}
+
+async function remoteRefresh(silent) {
+  if (!runtime.fbUrl || runtime.syncing) return;
+  runtime.syncing = true;
+  renderSync();
+  try {
+    const raw = await fbRequest("", { timeout: 9000 });
+    replaceState(raw || {});
+    saveLocal();
+    runtime.connected = true;
+    runtime.offline = false;
+    runtime.syncError = false;
+    runtime.bannerMode = "";
+    runtime.freshAt = Date.now();
+    if (session) {
+      if (!state.users[session.login]) {
+        session = null;
+        try {
+          localStorage.removeItem(LS.session);
+        } catch {}
+        showLogin(false);
+        toast("Your account no longer exists. Sign in again.", "error");
+      } else {
+        session.papel = state.users[session.login].papel;
+        try {
+          localStorage.setItem(LS.session, JSON.stringify(session));
+        } catch {}
+        if (!canDo(runtime.screen)) showScreen("chamados");
+      }
+    }
+    renderAllCurrent();
+    renderPageActions();
+    renderNavs();
+    renderSync();
+  } catch {
+    runtime.connected = false;
+    runtime.syncError = true;
+    runtime.bannerMode = "connect";
+    if (!silent) toast("Could not sync right now.", "error");
+    renderSync();
+  } finally {
+    runtime.syncing = false;
+    renderSync();
+  }
+}
+
+async function pushAll() {
+  if (!runtime.fbUrl) return false;
+  runtime.syncing = true;
+  renderSync();
+  try {
+    await fbPut("workOrders", state.workOrders);
+    await fbPut("machines", state.machines);
+    await fbPut("breakReasons", state.breakReasons);
+    await fbPut("users", state.users);
+    await fbPut("meta", state.meta);
+    runtime.connected = true;
+    runtime.syncError = false;
+    runtime.offline = false;
+    runtime.bannerMode = "";
+    runtime.freshAt = Date.now();
+    renderSync();
+    renderAllCurrent();
+    return true;
+  } catch {
+    runtime.connected = false;
+    runtime.syncError = true;
+    runtime.bannerMode = "write";
+    renderSync();
+    return false;
+  } finally {
+    runtime.syncing = false;
+    renderSync();
+  }
+}
+
+function persistMeta() {
+  saveLocal();
+  if (!runtime.fbUrl) return;
+  fbPut("meta", state.meta).then(() => {
+    runtime.connected = true;
+    runtime.syncError = false;
+    runtime.freshAt = Date.now();
+    renderSync();
+  }).catch(() => {
+    runtime.connected = false;
+    runtime.syncError = true;
+    runtime.bannerMode = "write";
+    renderSync();
+  });
+}
+
+async function persistOrder(order) {
+  state.workOrders[order.numero] = order;
+  saveLocal();
+  if (!runtime.fbUrl) return true;
+  try {
+    await fbPut(`workOrders/${order.numero}`, order);
+    runtime.connected = true;
+    runtime.syncError = false;
+    runtime.offline = false;
+    runtime.freshAt = Date.now();
+    renderSync();
+    return true;
+  } catch {
+    runtime.connected = false;
+    runtime.syncError = true;
+    runtime.bannerMode = "write";
+    renderSync();
+    return false;
+  }
+}
+
+async function persistCollection(name, id, value, remove) {
+  if (remove) delete state[name][id];
+  else state[name][id] = value;
+  saveLocal();
+  if (!runtime.fbUrl) return true;
+  try {
+    if (remove) await fbDelete(`${name}/${id}`);
+    else await fbPut(`${name}/${id}`, value);
+    runtime.connected = true;
+    runtime.syncError = false;
+    runtime.offline = false;
+    runtime.freshAt = Date.now();
+    renderSync();
+    return true;
+  } catch {
+    runtime.connected = false;
+    runtime.syncError = true;
+    runtime.bannerMode = "write";
+    renderSync();
+    return false;
+  }
+}
+
+function readSession() {
+  try {
+    const raw = localStorage.getItem(LS.session);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.login ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSession(user) {
+  session = { login: user.login, papel: user.papel };
+  try {
+    localStorage.setItem(LS.session, JSON.stringify(session));
+  } catch {}
+}
+
+function clearSession() {
+  session = null;
+  try {
+    localStorage.removeItem(LS.session);
+  } catch {}
+}
+
+function renderSync() {
+  let text = "Local mode";
+  let dotCls = "amber";
+  let note = "Data saved in this browser.";
+  if (runtime.fbUrl) {
+    if (runtime.syncing) {
+      text = "Syncing";
+      dotCls = "cyan";
+      note = "Reading Firebase.";
+    } else if (runtime.connected) {
+      text = "Synced";
+      dotCls = "green";
+      note = "Data shared through Firebase.";
+    } else {
+      text = "Offline";
+      dotCls = "red";
+      note = "Changes stay in this browser until it reconnects.";
+    }
+  }
+  ["#syncDot", "#sideSyncDot"].forEach((selector) => {
+    const el = $(selector);
+    if (el) el.className = `dot ${dotCls}`;
+  });
+  ["#syncText", "#sideSyncText"].forEach((selector) => {
+    const el = $(selector);
+    if (el) el.textContent = text;
+  });
+  const sideNote = $("#sideNote");
+  if (sideNote) sideNote.textContent = note;
+  const loginConnText = $("#loginConnText");
+  const loginConnDot = $("#loginConnDot");
+  if (loginConnText) loginConnText.textContent = text;
+  if (loginConnDot) loginConnDot.className = `dot ${dotCls}`;
+  const freshEl = $("#freshness");
+  if (freshEl) freshEl.textContent = runtime.freshAt ? `Updated ${hm(runtime.freshAt)}` : "";
+  const banner = $("#syncBanner");
+  if (banner) {
+    const show = !!runtime.fbUrl && (runtime.syncError || runtime.offline);
+    banner.classList.toggle("hidden", !show);
+    if (show) {
+      const bannerText = $("#syncBannerText");
+      if (bannerText) {
+        bannerText.textContent = runtime.bannerMode === "write"
+          ? "Could not send to Firebase. Changes are saved in this browser."
+          : "No connection to Firebase. Showing the last local copy.";
+      }
+    }
+  }
+  renderUser();
+}
+function setLoginTitle() {
+  const title = $("#screenTitle");
+  const slot = $("#loginTitleSlot");
+  if (title && slot && title.parentElement !== slot) slot.appendChild(title);
+  if (title) title.textContent = "Maintenance requests";
+}
+
+function setAppTitle(text) {
+  const title = $("#screenTitle");
+  const slot = $("#titleSlot");
+  if (title && slot && title.parentElement !== slot) slot.appendChild(title);
+  if (title) title.textContent = text;
+}
+
+function showLogin(clear) {
+  if (clear !== false) clearSession();
+  const app = $("#appShell");
+  const login = $("#loginView");
+  if (app) app.classList.add("hidden");
+  if (login) login.classList.remove("hidden");
+  const appDialog = $("#appDialog");
+  const confirmDialog = $("#confirmDialog");
+  if (appDialog && appDialog.open) appDialog.close();
+  if (confirmDialog && confirmDialog.open) confirmDialog.close();
+  setLoginTitle();
+  const error = $("#loginError");
+  if (error) error.textContent = "";
+  renderLogin();
+  renderSync();
+  window.scrollTo(0, 0);
+}
+
+function afterLogin(user, targetScreen, persist) {
+  if (persist === false) session = { login: user.login, papel: user.papel };
+  else writeSession(user);
+  const login = $("#loginView");
+  const app = $("#appShell");
+  if (login) login.classList.add("hidden");
+  if (app) app.classList.remove("hidden");
+  const error = $("#loginError");
+  if (error) error.textContent = "";
+  setAppTitle("Requests");
+  renderUser();
+  renderNavs();
+  renderSync();
+  const wanted = canDo(targetScreen) ? targetScreen : "chamados";
+  showScreen(wanted);
+}
+
+function canDo(screen) {
+  if (!session) return false;
+  if (screen === "chamados") return true;
+  if (screen === "dashboard") return session.papel === "maintenance" || session.papel === "admin";
+  if (screen === "gestao") return session.papel === "admin";
+  return false;
+}
+
+function canCreate() {
+  return !!session && (session.papel === "production" || session.papel === "maintenance" || session.papel === "admin");
+}
+
+function canAttend() {
+  return !!session && (session.papel === "maintenance" || session.papel === "admin");
+}
+
+function loginWith(login, senha, persist) {
+  const user = Object.values(state.users).find((item) => norm(item.login) === norm(login) && String(item.senha) === String(senha));
+  if (!user) return false;
+  afterLogin(user, null, persist);
+  return true;
+}
+
+function averageRepair() {
+  const done = Object.values(state.workOrders).filter((order) => order.status === "finished" && repairMs(order));
+  if (!done.length) return 0;
+  return done.reduce((sum, order) => sum + repairMs(order), 0) / done.length;
+}
+
+function renderLogin() {
+  const active = sortedActive();
+  const count = active.length;
+  const liveCount = $("#loginLiveCount");
+  if (liveCount) liveCount.textContent = count ? `${count} in progress` : "Nothing down";
+  const liveList = $("#loginLiveList");
+  if (liveList) {
+    liveList.innerHTML = active.length
+      ? active.slice(0, 3).map((order) => `
+          <div class="live-row">
+            <strong>${esc(order.numero)} · ${esc(machineName(order.machineId))}</strong>
+            <small>${esc(reasonName(order.motivoId))} · ${esc(URG[order.urgencia] ? URG[order.urgencia].label : order.urgencia)}</small>
+            <em data-live-login="${esc(order.numero)}">${esc(timeLabel(order))}</em>
+          </div>`).join("")
+      : '<div class="empty" style="padding:22px 4px"><p>No WO in progress right now.</p></div>';
+  }
+  const stats = $("#loginStats");
+  if (stats) {
+    const avg = averageRepair();
+    stats.innerHTML = `
+      <div class="login-stat"><span>Requests in history</span><strong>${Object.keys(state.workOrders).length}</strong></div>
+      <div class="login-stat"><span>Average repair time</span><strong>${avg ? dur(avg) : "-"}</strong></div>
+      <div class="login-stat"><span>Machines registered</span><strong>${Object.keys(state.machines).length}</strong></div>`;
+  }
+}
+
+function renderUser() {
+  const pill = $("#userPill");
+  if (!pill) return;
+  if (!session) {
+    pill.innerHTML = "";
+    return;
+  }
+  const role = ROLE[session.papel] || session.papel;
+  pill.innerHTML = `
+    <span class="user-avatar">${esc(initials(session.login))}</span>
+    <span class="user-copy"><strong>${esc(session.login)}</strong><small>${esc(role)}</small></span>`;
+}
+
+function navItems() {
+  const items = [
+    { id: "chamados", label: "Requests", icon: ICONS.chamados, count: activeOrders().length },
+    { id: "dashboard", label: "Dashboard", icon: ICONS.dashboard },
+    { id: "gestao", label: "Management", icon: ICONS.gestao }
+  ];
+  return items.filter((item) => canDo(item.id));
+}
+
+function renderNavs() {
+  const items = navItems();
+  const sideNav = $("#sideNav");
+  const mobileNav = $("#mobileNav");
+  if (sideNav) {
+    sideNav.innerHTML = items.map((item) => `
+      <button class="nav-item${runtime.screen === item.id ? " active" : ""}" type="button" data-nav="${item.id}"${runtime.screen === item.id ? ' aria-current="page"' : ""}>
+        ${item.icon}<span>${esc(item.label)}</span>${item.count != null ? `<span class="nav-count">${item.count}</span>` : ""}
+      </button>`).join("");
+  }
+  if (mobileNav) {
+    mobileNav.innerHTML = items.map((item) => `
+      <button class="nav-item${runtime.screen === item.id ? " active" : ""}" type="button" data-nav="${item.id}"${runtime.screen === item.id ? ' aria-current="page"' : ""}>
+        ${item.icon}<span>${esc(item.label)}</span>
+      </button>`).join("") + `
+      <button class="nav-item" type="button" data-action="logout">${ICONS.logout}<span>Sign out</span></button>`;
+  }
+}
+
+function periodHtml(extraClass) {
+  const periods = [[7, "7 days"], [30, "30 days"], [0, "All"]];
+  return `<div class="segmented${extraClass ? ` ${extraClass}` : ""}" aria-label="Period">
+    ${periods.map(([value, label]) => `<button type="button" data-period="${value}" class="${runtime.dashPeriod === value ? "active" : ""}">${label}</button>`).join("")}
+  </div>`;
+}
+
+function renderPageActions() {
+  const host = $("#pageActions");
+  if (!host) return;
+  if (runtime.screen === "chamados") {
+    host.innerHTML = canCreate()
+      ? `<button class="btn btn-primary only-mobile" type="button" data-action="new-wo">${ICONS.plus}<span>WO</span></button>`
+      : "";
+  } else if (runtime.screen === "dashboard") {
+    host.innerHTML = periodHtml("only-desktop");
+  } else if (runtime.screen === "gestao") {
+    host.innerHTML = `<button class="btn btn-secondary btn-sm only-desktop" type="button" data-action="sync">${ICONS.refresh}<span>Sync</span></button>`;
+  } else {
+    host.innerHTML = "";
+  }
+}
+
+function renderPeriodControls() {
+  const mobile = $("#dashPeriods");
+  if (mobile) mobile.innerHTML = periodHtml();
+  const actions = $("#pageActions");
+  if (actions && runtime.screen === "dashboard") actions.innerHTML = periodHtml("only-desktop");
+}
+
+function subtitles() {
+  if (runtime.screen === "chamados") {
+    const active = sortedActive();
+    if (!active.length) return "No requests in progress. Open a WO when a machine stops.";
+    const machines = new Set(active.map((order) => order.machineId)).size;
+    const oldest = active[0];
+    return `${active.length} in progress, ${machines} ${machines === 1 ? "machine down" : "machines down"}. The oldest is ${oldest.numero}, ${timeTitle(oldest).toLowerCase()}.`;
+  }
+  if (runtime.screen === "dashboard") {
+    const data = dashData();
+    if (!data.orders.length) return "No requests in the period. Open a WO to start measuring.";
+    const topMachine = data.machines[0];
+    if (topMachine) {
+      return `${data.orders.length} requests in the period. ${topMachine.nome} leads with ${topMachine.count} and average repair is ${data.avg ? dur(data.avg) : "-"}.`;
+    }
+    return `${data.orders.length} requests in the period. Average repair time of ${data.avg ? dur(data.avg) : "-"}.`;
+  }
+  return "Machines, reasons, users and this browser's connection.";
+}
+
+function showScreen(name) {
+  if (!canDo(name)) name = "chamados";
+  runtime.screen = name;
+  $$(".view").forEach((view) => view.classList.add("hidden"));
+  const view = $(`#view${name.charAt(0).toUpperCase()}${name.slice(1)}`);
+  if (view) view.classList.remove("hidden");
+  setAppTitle(name === "chamados" ? "Requests" : name === "dashboard" ? "Dashboard" : "Management");
+  if (name === "chamados") renderChamados();
+  else if (name === "dashboard") renderDashboard();
+  else if (name === "gestao") renderGestao();
+  renderPageActions();
+  renderNavs();
+  renderSync();
+  const subtitle = $("#pageSubtitle");
+  if (subtitle) subtitle.textContent = subtitles();
+  if (name === "chamados") {
+    const input = $("#woSearch");
+    if (input && input.value !== runtime.q) input.value = runtime.q;
+    setFilter(runtime.filter, false);
+  }
+  window.scrollTo(0, 0);
+}
+
+function renderAllCurrent() {
+  if (!session) {
+    renderLogin();
+    return;
+  }
+  if (runtime.screen === "chamados") renderChamados();
+  else if (runtime.screen === "dashboard") renderDashboard();
+  else if (runtime.screen === "gestao") renderGestao();
+  renderNavs();
+  renderPageActions();
+  const subtitle = $("#pageSubtitle");
+  if (subtitle) subtitle.textContent = subtitles();
+  renderUser();
+  renderSync();
+}
+function tabCounts() {
+  const all = Object.values(state.workOrders);
+  return {
+    andamento: all.filter((order) => order.status === "open" || order.status === "in_progress").length,
+    abertas: all.filter((order) => order.status === "open").length,
+    finalizadas: all.filter((order) => order.status === "finished").length,
+    todas: all.length
+  };
+}
+
+function setFilter(filter, rerender) {
+  runtime.filter = filter;
+  $$("#woTabs .tab").forEach((button) => {
+    const active = button.dataset.filter === filter;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  if (rerender !== false) renderWoList();
+}
+
+function filteredOrders() {
+  const query = norm(runtime.q);
+  let list = Object.values(state.workOrders);
+  if (runtime.filter === "andamento") list = list.filter((order) => order.status === "open" || order.status === "in_progress");
+  else if (runtime.filter === "abertas") list = list.filter((order) => order.status === "open");
+  else if (runtime.filter === "finalizadas") list = list.filter((order) => order.status === "finished");
+  if (query) {
+    list = list.filter((order) => norm(`${order.numero} ${machineName(order.machineId)} ${reasonName(order.motivoId)} ${TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo} ${STATUS[order.status] ? STATUS[order.status].label : order.status} ${order.criadoPor} ${order.descricao || ""}`).includes(query));
+  }
+  if (runtime.filter === "andamento" || runtime.filter === "abertas") {
+    return list.sort((a, b) => urgencyRank(a) - urgencyRank(b) || new Date(a.criadoEm || 0) - new Date(b.criadoEm || 0));
+  }
+  const active = list.filter((order) => order.status === "open" || order.status === "in_progress");
+  const rest = list.filter((order) => order.status !== "open" && order.status !== "in_progress");
+  active.sort((a, b) => urgencyRank(a) - urgencyRank(b) || new Date(a.criadoEm || 0) - new Date(b.criadoEm || 0));
+  rest.sort(byCreatedDesc);
+  return [...active, ...rest];
+}
+
+function renderChamados() {
+  renderChamadosKpis();
+  updateNavCounts();
+  renderWoList();
+  renderRecentRepairs();
+}
+
+function renderRecentRepairs() {
+  const host = $("#recentRepairs");
+  const panel = $("#recentPanel");
+  if (!host || !panel) return;
+  const finished = Object.values(state.workOrders)
+    .filter((order) => order.status === "finished" && order.finalizadoEm && order.iniciadoEm)
+    .sort((a, b) => new Date(b.finalizadoEm) - new Date(a.finalizadoEm));
+  panel.classList.toggle("hidden", !finished.length);
+  if (!finished.length) {
+    host.innerHTML = "";
+    return;
+  }
+  const shown = finished.slice(0, 6);
+  const count = $("#recentCount");
+  if (count) count.textContent = `${shown.length} of ${finished.length}`;
+  host.innerHTML = shown.map((order) => {
+    const repair = new Date(order.finalizadoEm) - new Date(order.iniciadoEm);
+    return `<button class="recent-row" type="button" data-action="wo-detail" data-id="${esc(order.numero)}">
+      <span class="recent-id">${esc(order.numero)}</span>
+      <span class="recent-main"><strong>${esc(machineName(order.machineId))}</strong><span>${esc(reasonName(order.motivoId))}</span></span>
+      <span class="recent-repair">${repair > 0 ? dur(repair) : "-"}</span>
+      <span class="recent-when">${esc(dt(order.finalizadoEm))}</span>
+    </button>`;
+  }).join("");
+}
+
+function updateNavCounts() {
+  const counts = tabCounts();
+  $$("#woTabs .tab-count").forEach((el) => {
+    el.textContent = counts[el.dataset.count] != null ? counts[el.dataset.count] : 0;
+  });
+}
+
+function renderChamadosKpis() {
+  const active = activeOrders();
+  const parked = new Set(active.map((order) => order.machineId)).size;
+  const doneToday = Object.values(state.workOrders).filter((order) => order.status === "finished" && sameDay(order.finalizadoEm, new Date())).length;
+  const avg = averageRepair();
+  const host = $("#chamadosKpis");
+  if (!host) return;
+  host.innerHTML = `
+    <div class="kpi-cell"><span class="kpi-label">In Progress</span><strong class="kpi-value accent">${active.length}</strong><span class="kpi-sub">WOs open or in progress</span></div>
+    <div class="kpi-cell"><span class="kpi-label">Machines down</span><strong class="kpi-value">${parked}</strong><span class="kpi-sub">${parked === 1 ? "Machine with an active WO" : "Machines with an active WO"}</span></div>
+    <div class="kpi-cell"><span class="kpi-label">Finished today</span><strong class="kpi-value">${doneToday}</strong><span class="kpi-sub">Repairs completed today</span></div>
+    <div class="kpi-cell"><span class="kpi-label">Average repair time</span><strong class="kpi-value">${avg ? dur(avg) : "-"}</strong><span class="kpi-sub">Average of finished WO</span></div>`;
+}
+
+function urgencyHtml(order) {
+  const urgency = URG[order.urgencia] || URG.medium;
+  const dotClass = order.urgencia === "high" ? "red" : order.urgencia === "medium" ? "amber" : "";
+  return `<span class="wo-urg"><span class="dot ${dotClass}"></span>${esc(urgency.label)}</span>`;
+}
+
+function statusHtml(order) {
+  const status = STATUS[order.status] || STATUS.open;
+  return `<span class="status ${status.cls}">${esc(status.label)}</span>`;
+}
+
+function rowActionHtml(order) {
+  if (!session) return "";
+  if (canAttend() && order.status === "open") {
+    return `<button class="btn btn-secondary" type="button" data-action="start-wo" data-id="${esc(order.numero)}">Start</button>`;
+  }
+  if (canAttend() && order.status === "in_progress") {
+    return `<button class="btn btn-secondary" type="button" data-action="attend-wo" data-id="${esc(order.numero)}">Continue</button>`;
+  }
+  return `<button class="btn btn-ghost" type="button" data-action="wo-detail" data-id="${esc(order.numero)}">View</button>`;
+}
+
+function renderWoList() {
+  const host = $("#woList");
+  if (!host) return;
+  const list = filteredOrders();
+  if (!list.length) {
+    let message = "No WO in this filter.";
+    if (runtime.q) message = "No WO found for this search.";
+    else if (runtime.filter === "finalizadas") message = "No finished WO yet.";
+    else if (runtime.filter === "abertas") message = "No open WO.";
+    else if (runtime.filter === "andamento") message = "No WO in progress.";
+    else if (runtime.filter === "todas") message = "No WO registered.";
+    host.innerHTML = `<div class="empty">
+      <h3>${esc(message)}</h3>
+      <p>${runtime.q ? "Try another number, machine or reason." : "Open a new WO when a machine stops or adjust the filter."}</p>
+      ${canCreate() ? `<button class="btn btn-secondary btn-sm" type="button" data-action="new-wo">${ICONS.plus}<span>New WO</span></button>` : ""}
+    </div>`;
+    return;
+  }
+  host.innerHTML = list.map((order) => {
+    const notQuality = order.naoQualidade ? ' <span class="nq">· Non-quality</span>' : "";
+    return `
+      <div class="wo-row" data-row="${esc(order.numero)}">
+        <button class="wo-ident" type="button" data-action="wo-detail" data-id="${esc(order.numero)}">
+          <span class="wo-title"><span class="wo-num">${esc(order.numero)}</span><span class="wo-machine">${esc(machineName(order.machineId))}</span></span>
+          <span class="wo-reason">${esc(reasonName(order.motivoId))} · by ${esc(order.criadoPor)}${notQuality}</span>
+        </button>
+        <span class="wo-meta">
+          <span class="wo-type">${esc(TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo)}</span>
+          ${urgencyHtml(order)}
+          ${statusHtml(order)}
+        </span>
+        <span class="wo-time" data-time="${esc(order.numero)}" title="${esc(timeTitle(order))}">${esc(timeLabel(order))}</span>
+        <span class="wo-act">${rowActionHtml(order)}</span>
+      </div>`;
+  }).join("");
+  updateLiveTimes();
+}
+
+function updateLiveTimes() {
+  $$("[data-time]").forEach((el) => {
+    const order = state.workOrders[el.dataset.time];
+    if (order) {
+      el.textContent = timeLabel(order);
+      el.title = timeTitle(order);
+    }
+  });
+  $$("[data-live-login]").forEach((el) => {
+    const order = state.workOrders[el.dataset.liveLogin];
+    if (order) el.textContent = timeLabel(order);
+  });
+}
+
+function dashData() {
+  const cutoff = runtime.dashPeriod ? Date.now() - runtime.dashPeriod * 86400000 : 0;
+  const orders = Object.values(state.workOrders).filter((order) => {
+    const created = dateOf(order.criadoEm);
+    return created ? created.getTime() >= cutoff : false;
+  });
+  const finished = orders.filter((order) => order.status === "finished" && repairMs(order));
+  const totalRepair = finished.reduce((sum, order) => sum + repairMs(order), 0);
+  const avg = finished.length ? totalRepair / finished.length : 0;
+  const reasonMap = {};
+  orders.forEach((order) => {
+    reasonMap[order.motivoId] = (reasonMap[order.motivoId] || 0) + 1;
+  });
+  const reasonRows = Object.entries(reasonMap).map(([id, count]) => ({ id, nome: reasonName(id), count })).sort((a, b) => b.count - a.count || a.nome.localeCompare(b.nome, "en-US"));
+  const reasonTotal = reasonRows.reduce((sum, row) => sum + row.count, 0);
+  let accumulated = 0;
+  const pareto = reasonRows.map((row) => {
+    accumulated += row.count;
+    return { ...row, pct: reasonTotal ? row.count / reasonTotal : 0, cum: reasonTotal ? accumulated / reasonTotal : 0 };
+  });
+  const machineMap = {};
+  orders.forEach((order) => {
+    machineMap[order.machineId] = (machineMap[order.machineId] || 0) + 1;
+  });
+  const machines = Object.entries(machineMap).map(([id, count]) => ({ id, nome: machineName(id), count })).sort((a, b) => b.count - a.count || a.nome.localeCompare(b.nome, "en-US"));
+  const repairByMachine = {};
+  finished.forEach((order) => {
+    repairByMachine[order.machineId] = repairByMachine[order.machineId] || [];
+    repairByMachine[order.machineId].push(repairMs(order));
+  });
+  const machineAvg = machines.map((machine) => {
+    const list = repairByMachine[machine.id] || [];
+    return { ...machine, avg: list.length ? list.reduce((sum, value) => sum + value, 0) / list.length : 0 };
+  });
+  const types = Object.fromEntries(Object.keys(TYPE).map((key) => [key, 0]));
+  const urgency = Object.fromEntries(Object.keys(URG).map((key) => [key, 0]));
+  orders.forEach((order) => {
+    types[order.tipo] = (types[order.tipo] || 0) + 1;
+    urgency[order.urgencia] = (urgency[order.urgencia] || 0) + 1;
+  });
+  return { orders, finished, totalRepair, avg, pareto, machines, machineAvg, types, urgency, reasonTotal };
+}
+
+function renderDashboard() {
+  const data = dashData();
+  const topReason = data.pareto[0];
+  const topMachine = data.machines[0];
+  const kpis = $("#dashKpis");
+  if (kpis) {
+    kpis.innerHTML = `
+      <div class="kpi-cell"><span class="kpi-label">Total time</span><strong class="kpi-value lead">${data.finished.length ? dur(data.totalRepair) : "-"}</strong><span class="kpi-sub">${data.finished.length} finished WOs in the period</span></div>
+      <div class="kpi-cell"><span class="kpi-label">Average repair time</span><strong class="kpi-value">${data.avg ? dur(data.avg) : "-"}</strong><span class="kpi-sub">From start to finish</span></div>
+      <div class="kpi-cell"><span class="kpi-label">Machine with most requests</span><strong class="kpi-value is-text" title="${topMachine ? esc(topMachine.nome) : ""}">${topMachine ? esc(topMachine.nome) : "-"}</strong><span class="kpi-sub">${topMachine ? `${topMachine.count} ${topMachine.count === 1 ? "request" : "requests"} in the period` : "No requests in the period"}</span></div>
+      <div class="kpi-cell"><span class="kpi-label">Most frequent reason</span><strong class="kpi-value is-text" title="${topReason ? esc(topReason.nome) : ""}">${topReason ? esc(topReason.nome) : "-"}</strong><span class="kpi-sub">${topReason ? `${topReason.count} ${topReason.count === 1 ? "request" : "requests"}` : "No reasons in the period"}</span></div>`;
+  }
+  const paretoList = $("#paretoList");
+  if (paretoList) {
+    paretoList.innerHTML = data.pareto.length
+      ? data.pareto.map((row) => `
+          <div class="pareto-row">
+            <div class="pareto-line">
+              <span class="pareto-name">${esc(row.nome)}</span>
+              <span class="pareto-count">${row.count}</span>
+              <span class="pareto-cum">${Math.round(row.cum * 100)}% cum.</span>
+            </div>
+            <div class="pareto-track"><i style="width:${Math.max(3, Math.round(row.pct * 100))}%"></i></div>
+          </div>`).join("")
+      : '<div class="empty" style="padding:22px 4px"><p>No reasons logged in the period.</p></div>';
+  }
+  const paretoInsight = $("#paretoInsight");
+  if (paretoInsight) {
+    if (!data.pareto.length) {
+      paretoInsight.innerHTML = "";
+    } else {
+      const target = data.pareto.find((row) => row.cum >= 0.7) || data.pareto[data.pareto.length - 1];
+      const count = data.pareto.indexOf(target) + 1;
+      paretoInsight.innerHTML = `<strong>${Math.round(target.cum * 100)}%</strong><span>Concentration</span><p>of requests come from ${count} ${count === 1 ? "reason" : "reasons"}. Start there.</p>`;
+    }
+  }
+  const paretoFoot = $("#paretoFoot");
+  if (paretoFoot) paretoFoot.textContent = data.reasonTotal ? `${data.reasonTotal} requests in the period. The bar shows each reason's share.` : "The list appears when there are requests in the period.";
+  const typeColors = { corrective: "var(--accent)", predictive: "#8f969d", preventive: "#3a4047" };
+  const typeTotal = Object.values(data.types).reduce((sum, value) => sum + value, 0);
+  const typeList = $("#typeList");
+  if (typeList) {
+    typeList.innerHTML = `
+      <div class="split-bar" aria-hidden="true">${Object.entries(data.types).filter(([, count]) => count).map(([key, count]) => `<i style="width:${typeTotal ? (count / typeTotal * 100) : 0}%;background:${typeColors[key]}"></i>`).join("")}</div>
+      ${Object.entries(data.types).map(([key, count]) => `
+        <div class="split-row">
+          <span class="split-dot" style="background:${typeColors[key]}"></span>
+          <span class="split-name">${esc(TYPE[key].label)}</span>
+          <span class="split-val">${count}</span>
+          <span class="split-pct">${typeTotal ? Math.round(count / typeTotal * 100) : 0}%</span>
+        </div>`).join("")}`;
+  }
+  const urgencyTotal = Object.values(data.urgency).reduce((sum, value) => sum + value, 0);
+  const urgencyColors = { high: "var(--negative)", medium: "var(--warning)", low: "var(--faint)" };
+  const urgencyList = $("#urgencyList");
+  if (urgencyList) {
+    urgencyList.innerHTML = Object.entries(data.urgency).map(([key, count]) => `
+      <div class="split-row">
+        <span class="split-dot" style="background:${urgencyColors[key]}"></span>
+        <span class="split-name">${esc(URG[key].label)}</span>
+        <span class="split-val">${count}</span>
+        <span class="split-pct">${urgencyTotal ? Math.round(count / urgencyTotal * 100) : 0}%</span>
+      </div>`).join("");
+  }
+  const maxMachine = data.machines[0] ? data.machines[0].count : 1;
+  const machineList = $("#machineList");
+  if (machineList) {
+    machineList.innerHTML = data.machines.length
+      ? data.machines.slice(0, 5).map((machine, index) => `
+          <div class="machine-row">
+            <span class="machine-rank">${index + 1}.</span>
+            <span class="machine-name">${esc(machine.nome)}</span>
+            <span class="machine-count">${machine.count}</span>
+            <span class="machine-track"><i style="width:${Math.max(4, Math.round(machine.count / maxMachine * 100))}%"></i></span>
+          </div>`).join("")
+      : '<div class="empty" style="padding:22px 4px"><p>No machines with requests in the period.</p></div>';
+  }
+  const machineFoot = $("#machineFoot");
+  if (machineFoot) machineFoot.textContent = data.machines.length ? "The bar compares volume with the top machine." : "";
+  const machineAvg = $("#machineAvg");
+  if (machineAvg) {
+    machineAvg.innerHTML = data.machineAvg.length ? `
+      <div class="machine-avg-head"><span>Average repair by machine</span><span>Time</span></div>
+      ${data.machineAvg.slice(0, 5).map((machine) => `<div class="machine-avg-row"><span>${esc(machine.nome)}</span><strong>${machine.avg ? dur(machine.avg) : "-"}</strong></div>`).join("")}` : "";
+  }
+  const rows = [...data.orders].sort(byCreatedDesc);
+  const tableSub = $("#tableSub");
+  if (tableSub) tableSub.textContent = `${rows.length} WO in the period. Wait, repair and total time.`;
+  const tableBody = $("#woTableBody");
+  if (tableBody) {
+    tableBody.innerHTML = rows.length
+      ? rows.map((order) => {
+          const repair = order.status === "finished" ? (repairMs(order) ? dur(repairMs(order)) : "-") : order.status === "in_progress" ? dur(repairMs(order)) : "-";
+          const wait = dateOf(order.criadoEm) ? dur(waitMs(order)) : "-";
+          const total = dateOf(order.criadoEm) ? dur(totalMs(order)) : "-";
+          return `
+            <tr>
+              <td><button class="link-btn" type="button" data-action="wo-detail" data-id="${esc(order.numero)}">${esc(order.numero)}</button></td>
+              <td>${esc(machineName(order.machineId))}</td>
+              <td>${esc(TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo)}</td>
+              <td class="num">${esc(wait)}</td>
+              <td class="num">${esc(repair)}</td>
+              <td class="num">${esc(total)}</td>
+              <td>${statusHtml(order)}</td>
+            </tr>`;
+        }).join("")
+      : '<tr><td colspan="7"><div class="empty" style="padding:22px 4px"><p>No requests in the selected period.</p></div></td></tr>';
+  }
+  const timeCards = $("#timeCards");
+  if (timeCards) {
+    timeCards.innerHTML = rows.length
+      ? rows.map((order) => {
+          const repair = order.status === "finished" ? (repairMs(order) ? dur(repairMs(order)) : "-") : order.status === "in_progress" ? dur(repairMs(order)) : "-";
+          const wait = dateOf(order.criadoEm) ? dur(waitMs(order)) : "-";
+          const total = dateOf(order.criadoEm) ? dur(totalMs(order)) : "-";
+          return `
+            <div class="time-card">
+              <div class="time-card-top">
+                <div><span class="time-card-id">${esc(order.numero)}</span><span class="time-card-machine">${esc(machineName(order.machineId))} · ${esc(TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo)}</span></div>
+                ${statusHtml(order)}
+              </div>
+              <div class="time-card-times">
+                <span>Wait<strong>${esc(wait)}</strong></span>
+                <span>Repair<strong>${esc(repair)}</strong></span>
+                <span>Total<strong>${esc(total)}</strong></span>
+              </div>
+            </div>`;
+        }).join("")
+      : '<div class="empty" style="padding:22px 4px"><p>No requests in the selected period.</p></div>';
+  }
+  renderPeriodControls();
+}
+function renderGestao() {
+  const machines = Object.values(state.machines).sort((a, b) => a.nome.localeCompare(b.nome, "en-US"));
+  const reasons = Object.values(state.breakReasons).sort((a, b) => a.nome.localeCompare(b.nome, "en-US"));
+  const users = Object.values(state.users).sort((a, b) => a.login.localeCompare(b.login, "en-US"));
+  const machineSub = $("#machineAdminSub");
+  const reasonSub = $("#reasonAdminSub");
+  const userSub = $("#userAdminSub");
+  if (machineSub) machineSub.textContent = `${machines.length} ${machines.length === 1 ? "machine registered" : "machines registered"}`;
+  if (reasonSub) reasonSub.textContent = `${reasons.length} ${reasons.length === 1 ? "reason registered" : "reasons registered"}`;
+  if (userSub) userSub.textContent = `${users.length} ${users.length === 1 ? "account registered" : "accounts registered"}`;
+  const machineList = $("#machineAdminList");
+  if (machineList) {
+    machineList.innerHTML = machines.length
+      ? machines.map((machine) => `
+          <div class="admin-row">
+            <div class="admin-ident"><strong>${esc(machine.nome)}</strong><span>${esc(machine.id)}</span></div>
+            <div class="admin-actions">
+              <button class="text-btn" type="button" data-action="edit-machine" data-id="${esc(machine.id)}">Edit</button>
+              <button class="text-btn danger" type="button" data-action="delete-machine" data-id="${esc(machine.id)}">Delete</button>
+            </div>
+          </div>`).join("")
+      : '<div class="empty" style="padding:20px 4px"><p>No machines registered.</p></div>';
+  }
+  const reasonList = $("#reasonAdminList");
+  if (reasonList) {
+    reasonList.innerHTML = reasons.length
+      ? reasons.map((reason) => `
+          <div class="admin-row">
+            <div class="admin-ident"><strong>${esc(reason.nome)}</strong><span>${esc(reason.id)}</span></div>
+            <div class="admin-actions">
+              <button class="text-btn" type="button" data-action="edit-reason" data-id="${esc(reason.id)}">Edit</button>
+              <button class="text-btn danger" type="button" data-action="delete-reason" data-id="${esc(reason.id)}">Delete</button>
+            </div>
+          </div>`).join("")
+      : '<div class="empty" style="padding:20px 4px"><p>No reasons registered.</p></div>';
+  }
+  const userList = $("#userAdminList");
+  if (userList) {
+    userList.innerHTML = users.length
+      ? users.map((user) => `
+          <div class="admin-row">
+            <div class="admin-ident"><strong>${esc(user.login)}</strong><span>${esc(ROLE[user.papel] || user.papel)}${session && user.login === session.login ? " · you" : ""}</span></div>
+            <div class="admin-actions">
+              <button class="text-btn" type="button" data-action="edit-user" data-id="${esc(user.login)}">Edit</button>
+              <button class="text-btn danger" type="button" data-action="delete-user" data-id="${esc(user.login)}">Delete</button>
+            </div>
+          </div>`).join("")
+      : '<div class="empty" style="padding:20px 4px"><p>No accounts registered.</p></div>';
+  }
+  const connStatus = $("#connStatus");
+  if (connStatus) {
+    const dotClass = runtime.fbUrl ? (runtime.connected ? "green" : "red") : "amber";
+    const label = runtime.fbUrl ? (runtime.connected ? "Firebase connected" : "Firebase not responding") : "Local mode";
+    connStatus.innerHTML = `<span class="dot ${dotClass}"></span><span>${label}</span>`;
+  }
+  const urlInput = $("#firebaseUrl");
+  if (urlInput && document.activeElement !== urlInput) urlInput.value = runtime.fbUrl || "";
+  const disconnect = $("#disconnectBtn");
+  if (disconnect) disconnect.disabled = !runtime.fbUrl;
+  const restoreRow = $("#restoreSeedRow");
+  const clearRow = $("#clearDataRow");
+  const pushRow = $("#pushAllRow");
+  if (restoreRow) restoreRow.classList.toggle("hidden", !!runtime.fbUrl);
+  if (clearRow) clearRow.classList.toggle("hidden", !!runtime.fbUrl);
+  if (pushRow) pushRow.classList.toggle("hidden", !runtime.fbUrl);
+  const stats = $("#dataStats");
+  if (stats) {
+    stats.innerHTML = `
+      <div class="data-stat"><span>WOs in history</span><strong>${Object.keys(state.workOrders).length}</strong></div>
+      <div class="data-stat"><span>Machines</span><strong>${Object.keys(state.machines).length}</strong></div>
+      <div class="data-stat"><span>Reasons</span><strong>${Object.keys(state.breakReasons).length}</strong></div>`;
+  }
+}
+
+function setDialogError(message) {
+  const el = $("#dialogError");
+  if (el) el.textContent = message || "";
+}
+
+function openDialog(options) {
+  runtime.dialogMode = options.mode || "";
+  runtime.dialogId = options.id || "";
+  const title = $("#dialogTitle");
+  const sub = $("#dialogSub");
+  const body = $("#dialogBody");
+  const actions = $("#dialogActions");
+  if (title) title.textContent = options.title || "";
+  if (sub) {
+    sub.textContent = options.sub || "";
+    sub.classList.toggle("hidden", !options.sub);
+  }
+  if (body) body.innerHTML = (options.body || "") + (options.errorSlot === false ? "" : '<p id="dialogError" class="form-error" role="alert"></p>');
+  if (actions) actions.innerHTML = options.actions || "";
+  const dialog = $("#appDialog");
+  if (dialog && !dialog.open) dialog.showModal();
+  setTimeout(() => {
+    const first = $("#dialogBody input:not([type=hidden]):not([readonly]):not([disabled]), #dialogBody textarea, #dialogBody select");
+    if (first) first.focus();
+  }, 40);
+}
+
+function closeDialog() {
+  const dialog = $("#appDialog");
+  if (dialog && dialog.open) dialog.close();
+  runtime.dialogMode = "";
+  runtime.dialogId = "";
+}
+
+function toast(message, kind) {
+  const el = $("#toast");
+  if (!el) return;
+  el.textContent = message;
+  el.className = `toast show${kind === "error" ? " error" : ""}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.className = "toast";
+  }, 3800);
+}
+
+function confirmAction(options) {
+  runtime.confirmAction = options.action || null;
+  const title = $("#confirmTitle");
+  const message = $("#confirmMessage");
+  const ok = $("#confirmOk");
+  const cancel = $("#confirmCancel");
+  if (title) title.textContent = options.title || "Confirm";
+  if (message) message.textContent = options.message || "";
+  if (ok) {
+    ok.textContent = options.okLabel || "Confirm";
+    ok.className = `btn ${options.danger ? "btn-outline-danger" : "btn-primary"}`;
+  }
+  if (cancel) cancel.textContent = options.cancelLabel || "Cancel";
+  const dialog = $("#confirmDialog");
+  if (dialog && !dialog.open) dialog.showModal();
+}
+
+function csvEscape(value) {
+  const text = String(value == null ? "" : value);
+  if (/[;"\n\r]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+  return text;
+}
+
+function exportOrders() {
+  const source = runtime.screen === "dashboard" ? dashData().orders : Object.values(state.workOrders);
+  const rows = [...source].sort(byCreatedDesc);
+  const header = ["wo", "machine", "type", "reason", "urgency", "non_quality", "status", "created_at", "created_by", "started_at", "started_by", "finished_at", "finished_by", "rejection_reason", "wait_min", "repair_min", "total_min", "description", "diagnosis", "fix", "parts"];
+  const lines = [header.join(";")];
+  rows.forEach((order) => {
+    lines.push([
+      order.numero,
+      machineName(order.machineId),
+      TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo,
+      csvReason(order),
+      URG[order.urgencia] ? URG[order.urgencia].label : order.urgencia,
+      order.naoQualidade ? "yes" : "no",
+      STATUS[order.status] ? STATUS[order.status].label : order.status,
+      dt(order.criadoEm),
+      order.criadoPor,
+      dt(order.iniciadoEm),
+      order.iniciadoPor,
+      dt(order.finalizadoEm),
+      order.finalizadoPor,
+      order.motivoRejeicao,
+      minutesValue(waitMs(order)),
+      minutesValue(repairMs(order)),
+      minutesValue(totalMs(order)),
+      order.descricao,
+      order.diagnostico,
+      order.oQueFoiArrumado,
+      order.pecasUtilizadas.map((part) => `${part.qtd} x ${part.nome}`).join(" | ")
+    ].map(csvEscape).join(";"));
+  });
+  const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `work-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`${rows.length} WO exported to CSV.`);
+}
+
+function parseCsvLine(line, delimiter) {
+  const cells = [];
+  let current = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (quoted) {
+      if (char === '"') {
+        if (line[index + 1] === '"') {
+          current += '"';
+          index += 1;
+        } else {
+          quoted = false;
+        }
+      } else {
+        current += char;
+      }
+    } else if (char === '"') {
+      quoted = true;
+    } else if (char === delimiter) {
+      cells.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  cells.push(current);
+  return cells.map((cell) => cell.trim());
+}
+
+function openImportDialog() {
+  openDialog({
+    title: "Import catalog",
+    sub: "One line per item, in the format type,name,id.",
+    mode: "import",
+    body: `
+      <div class="field">
+        <label for="csvRows">CSV rows</label>
+        <textarea id="csvRows" placeholder="machine,Winder 3&#10;reason,Lack of air"></textarea>
+        <p class="field-desc">The type can be machine or reason. The id is optional and, when missing, is created from the name.</p>
+      </div>
+      <div class="field">
+        <label for="csvFile">Or choose a file</label>
+        <input id="csvFile" class="input" type="file" accept=".csv,text/csv">
+      </div>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit">Import</button>`
+  });
+}
+
+async function submitImport() {
+  const textarea = $("#csvRows");
+  const text = textarea ? textarea.value.replace(/^\uFEFF/, "") : "";
+  const lines = text.split(/\r?\n/).filter((line) => line.trim());
+  if (!lines.length) {
+    setDialogError("Paste a few lines or choose a CSV file.");
+    return;
+  }
+  const delimiter = lines[0].includes(";") ? ";" : ",";
+  let added = 0;
+  let skipped = 0;
+  for (const line of lines) {
+    const cells = parseCsvLine(line, delimiter);
+    const type = norm(cells[0]);
+    if (type === "type") continue;
+    const name = String(cells[1] || "").trim();
+    if (!name) {
+      skipped += 1;
+      continue;
+    }
+    let collection = "";
+    if (["machine", "machines"].includes(type)) collection = "machines";
+    if (["reason", "reasons"].includes(type)) collection = "breakReasons";
+    if (!collection) {
+      skipped += 1;
+      continue;
+    }
+    const exists = Object.values(state[collection]).some((item) => norm(item.nome) === norm(name));
+    if (exists) {
+      skipped += 1;
+      continue;
+    }
+    let id = cells[2] ? slug(cells[2]) : slug(name);
+    if (state[collection][id]) {
+      let suffix = 2;
+      while (state[collection][`${id}-${suffix}`]) suffix += 1;
+      id = `${id}-${suffix}`;
+    }
+    await persistCollection(collection, id, { id, nome: name });
+    added += 1;
+  }
+  if (!added) {
+    setDialogError("No new items. Check the format, names and whether they already exist.");
+    return;
+  }
+  closeDialog();
+  renderGestao();
+  renderSync();
+  toast(`${added} ${added === 1 ? "item imported" : "items imported"}${skipped ? `, ${skipped} skipped` : ""}.`);
+}
+
+function openMachineForm(id) {
+  const editing = id ? state.machines[id] : null;
+  openDialog({
+    title: editing ? "Edit machine" : "Add machine",
+    sub: editing ? `Identifier: ${editing.id}` : "The identifier is created from the name.",
+    mode: "machine",
+    id: editing ? editing.id : "",
+    body: `
+      <div class="field">
+        <label for="machineName">Machine name</label>
+        <input id="machineName" class="input" value="${editing ? esc(editing.nome) : ""}" placeholder="Winder 3" maxlength="60" required>
+      </div>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit">${editing ? "Save" : "Add"}</button>`
+  });
+}
+
+async function submitMachine() {
+  const input = $("#machineName");
+  const name = input ? input.value.trim() : "";
+  if (!name) {
+    setDialogError("Enter the machine name.");
+    return;
+  }
+  const editingId = runtime.dialogId;
+  let id = editingId;
+  if (!id) {
+    id = slug(name);
+    if (state.machines[id]) {
+      let suffix = 2;
+      while (state.machines[`${id}-${suffix}`]) suffix += 1;
+      id = `${id}-${suffix}`;
+    }
+  }
+  const ok = await persistCollection("machines", id, { id, nome: name });
+  closeDialog();
+  renderGestao();
+  renderSync();
+  toast(ok ? `Machine ${editingId ? "updated" : "added"}.` : "Machine saved in this browser. Firebase did not respond.", ok ? "" : "error");
+}
+
+function openReasonForm(id) {
+  const editing = id ? state.breakReasons[id] : null;
+  openDialog({
+    title: editing ? "Edit reason" : "Add reason",
+    sub: editing ? `Identifier: ${editing.id}` : "The identifier is created from the name.",
+    mode: "reason",
+    id: editing ? editing.id : "",
+    body: `
+      <div class="field">
+        <label for="reasonName">Reason name</label>
+        <input id="reasonName" class="input" value="${editing ? esc(editing.nome) : ""}" placeholder="Lack of compressed air" maxlength="60" required>
+      </div>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit">${editing ? "Save" : "Add"}</button>`
+  });
+}
+
+async function submitReason() {
+  const input = $("#reasonName");
+  const name = input ? input.value.trim() : "";
+  if (!name) {
+    setDialogError("Enter the reason name.");
+    return;
+  }
+  const editingId = runtime.dialogId;
+  let id = editingId;
+  if (!id) {
+    id = slug(name);
+    if (state.breakReasons[id]) {
+      let suffix = 2;
+      while (state.breakReasons[`${id}-${suffix}`]) suffix += 1;
+      id = `${id}-${suffix}`;
+    }
+  }
+  const ok = await persistCollection("breakReasons", id, { id, nome: name });
+  closeDialog();
+  renderGestao();
+  renderSync();
+  toast(ok ? `Reason ${editingId ? "updated" : "added"}.` : "Reason saved in this browser. Firebase did not respond.", ok ? "" : "error");
+}
+
+function openUserForm(login) {
+  const editing = login ? state.users[login] : null;
+  const self = !!(editing && session && editing.login === session.login);
+  openDialog({
+    title: editing ? "Edit user" : "Add user",
+    sub: editing ? `Account ${editing.login}` : "The login becomes the account identifier.",
+    mode: "user",
+    id: editing ? editing.login : "",
+    body: `
+      <div class="form-grid">
+        <div class="field">
+          <label for="userLogin">Username</label>
+          <input id="userLogin" class="input" value="${editing ? esc(editing.login) : ""}" placeholder="john.smith" maxlength="32" autocomplete="off" spellcheck="false" ${editing ? "readonly" : ""} required>
+        </div>
+        <div class="field">
+          <label for="userRole">Role</label>
+          <select id="userRole" class="input" ${self ? "disabled" : ""}>
+            <option value="production" ${editing && editing.papel === "production" ? "selected" : ""}>Production</option>
+            <option value="maintenance" ${editing && editing.papel === "maintenance" ? "selected" : ""}>Maintenance</option>
+            <option value="admin" ${editing && editing.papel === "admin" ? "selected" : ""}>Administrator</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="userPass">Password</label>
+          <input id="userPass" class="input" type="password" placeholder="${editing ? "Leave blank to keep" : "At least 4 characters"}" autocomplete="new-password">
+          <p class="field-desc">${editing ? "Fill this only if you want to change the password." : "The password is stored as plain text in the demo database."}</p>
+        </div>
+      </div>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit">${editing ? "Save" : "Add"}</button>`
+  });
+}
+
+async function submitUser() {
+  const loginInput = $("#userLogin");
+  const passInput = $("#userPass");
+  const roleInput = $("#userRole");
+  const editingLogin = runtime.dialogId;
+  const login = loginInput ? loginInput.value.trim() : "";
+  const password = passInput ? passInput.value : "";
+  const role = roleInput ? roleInput.value : "production";
+  if (!editingLogin && !/^[a-zA-Z0-9_-]{3,32}$/.test(login)) {
+    setDialogError("Use 3 to 32 characters: letters, numbers, hyphen or underscore.");
+    return;
+  }
+  if (!editingLogin) {
+    const exists = Object.values(state.users).some((user) => norm(user.login) === norm(login));
+    if (exists) {
+      setDialogError("That login already exists.");
+      return;
+    }
+    if (password.length < 4) {
+      setDialogError("Password must be at least 4 characters.");
+      return;
+    }
+  }
+  if (editingLogin && !password && !state.users[editingLogin]) {
+    setDialogError("The account no longer exists. Reload the page.");
+    return;
+  }
+  const current = editingLogin ? state.users[editingLogin] : null;
+  const finalRole = current && session && current.login === session.login ? current.papel : role;
+  if (current && current.papel === "admin" && finalRole !== "admin" && adminCount() <= 1) {
+    setDialogError("Keep at least one active administrator.");
+    return;
+  }
+  if (current && !password && !finalRole) {
+    setDialogError("Select a role.");
+    return;
+  }
+  const key = editingLogin || login;
+  const value = { login: key, senha: password || (current ? current.senha : ""), papel: finalRole };
+  if (!value.senha) {
+    setDialogError("Enter a password for the new account.");
+    return;
+  }
+  const ok = await persistCollection("users", key, value);
+  if (session && session.login === key) session.papel = value.papel;
+  closeDialog();
+  renderGestao();
+  renderNavs();
+  renderSync();
+  toast(ok ? `User ${editingLogin ? "updated" : "added"}.` : "User saved in this browser. Firebase did not respond.", ok ? "" : "error");
+}
+
+function adminCount() {
+  return Object.values(state.users).filter((user) => user.papel === "admin").length;
+}
+
+function askDeleteMachine(id) {
+  const machine = state.machines[id];
+  if (!machine) return;
+  const used = Object.values(state.workOrders).some((order) => order.machineId === id);
+  if (used) {
+    toast("This machine has WOs in history. Edit the name instead of deleting it.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Delete machine",
+    message: `Delete "${machine.nome}"? It will no longer appear when opening a WO.`,
+    okLabel: "Delete",
+    danger: true,
+    action: async () => {
+      const ok = await persistCollection("machines", id, null, true);
+      renderGestao();
+      renderSync();
+      toast(ok ? "Machine deleted." : "Machine deleted in this browser. Firebase did not respond.", ok ? "" : "error");
+    }
+  });
+}
+
+function askDeleteReason(id) {
+  const reason = state.breakReasons[id];
+  if (!reason) return;
+  const used = Object.values(state.workOrders).some((order) => order.motivoId === id);
+  if (used) {
+    toast("This reason has WOs in history. Edit the name instead of deleting it.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Delete reason",
+    message: `Delete "${reason.nome}"? It will no longer appear when opening a WO.`,
+    okLabel: "Delete",
+    danger: true,
+    action: async () => {
+      const ok = await persistCollection("breakReasons", id, null, true);
+      renderGestao();
+      renderSync();
+      toast(ok ? "Reason deleted." : "Reason deleted in this browser. Firebase did not respond.", ok ? "" : "error");
+    }
+  });
+}
+
+function askDeleteUser(login) {
+  const user = state.users[login];
+  if (!user) return;
+  if (session && session.login === login) {
+    toast("You cannot delete your own account.", "error");
+    return;
+  }
+  if (user.papel === "admin" && adminCount() <= 1) {
+    toast("Keep at least one active administrator.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Delete user",
+    message: `Delete the account "${login}"? The person will lose access to this app.`,
+    okLabel: "Delete",
+    danger: true,
+    action: async () => {
+      const ok = await persistCollection("users", login, null, true);
+      renderGestao();
+      renderSync();
+      toast(ok ? "User deleted." : "User deleted in this browser. Firebase did not respond.", ok ? "" : "error");
+    }
+  });
+}
+
+function openDetail(numero) {
+  const order = state.workOrders[numero];
+  if (!order) {
+    toast("This WO no longer exists.", "error");
+    return;
+  }
+  const status = STATUS[order.status] || STATUS.open;
+  const parts = order.pecasUtilizadas.length
+    ? `<div class="parts">${order.pecasUtilizadas.map((part) => `<div class="log-row"><span>${esc(part.nome)}</span><strong>${part.qtd} x</strong></div>`).join("")}</div>`
+    : '<p class="panel-desc">No parts logged.</p>';
+  const logs = [...order.statusLog].sort((a, b) => new Date(a.em || 0) - new Date(b.em || 0));
+  const logHtml = logs.length
+    ? `<div class="log">${logs.map((row) => `<div class="log-row"><span><strong>${esc(STATUS[row.status] ? STATUS[row.status].label : row.status)}</strong>${row.por ? ` · ${esc(row.por)}` : ""}</span><time>${esc(dt(row.em))}</time></div>`).join("")}</div>`
+    : '<p class="panel-desc">No events logged.</p>';
+  const rejection = order.status === "rejected" && order.motivoRejeicao
+    ? `<div class="detail-block"><h3>Rejection reason</h3><p>${esc(order.motivoRejeicao)}</p></div>`
+    : "";
+  const actions = [`<button class="btn btn-secondary" type="button" data-close>Close</button>`];
+  if (canAttend() && order.status === "open") {
+    actions.push(`<button class="btn btn-primary" type="button" data-dialog-action="start">Start repair</button>`);
+  }
+  if (canAttend() && order.status === "in_progress") {
+    actions.push(`<button class="btn btn-outline-danger" type="button" data-dialog-action="reject">Reject</button>`);
+    actions.push(`<button class="btn btn-primary" type="button" data-dialog-action="finish">Finish repair</button>`);
+  }
+  openDialog({
+    title: order.numero,
+    sub: `${machineName(order.machineId)} · ${reasonName(order.motivoId)}`,
+    mode: "detail",
+    id: order.numero,
+    errorSlot: false,
+    body: `
+      <div class="detail-grid">
+        <div class="detail-item"><span>Status</span>${statusHtml(order)}</div>
+        <div class="detail-item"><span>Type</span><strong>${esc(TYPE[order.tipo] ? TYPE[order.tipo].label : order.tipo)}</strong></div>
+        <div class="detail-item"><span>Urgency</span><strong>${esc(URG[order.urgencia] ? URG[order.urgencia].label : order.urgencia)}</strong></div>
+        <div class="detail-item"><span>Non-quality</span><strong>${order.naoQualidade ? "Yes" : "No"}</strong></div>
+        <div class="detail-item"><span>Opened by</span><strong>${esc(order.criadoPor)}</strong></div>
+        <div class="detail-item"><span>Opened at</span><strong>${esc(dt(order.criadoEm))}</strong></div>
+        <div class="detail-item"><span>Wait</span><strong>${esc(dur(waitMs(order)))}</strong></div>
+        <div class="detail-item"><span>Repair start</span><strong>${esc(dt(order.iniciadoEm))}</strong></div>
+        <div class="detail-item"><span>Repair time</span><strong>${repairMs(order) ? esc(dur(repairMs(order))) : "-"}</strong></div>
+        <div class="detail-item"><span>Repair end</span><strong>${esc(dt(order.finalizadoEm))}</strong></div>
+      </div>
+      ${order.descricao ? `<div class="detail-block"><h3>Production report</h3><p>${esc(order.descricao)}</p></div>` : ""}
+      ${order.diagnostico ? `<div class="detail-block"><h3>Diagnosis</h3><p>${esc(order.diagnostico)}</p></div>` : ""}
+      ${order.oQueFoiArrumado ? `<div class="detail-block"><h3>What was fixed</h3><p>${esc(order.oQueFoiArrumado)}</p></div>` : ""}
+      ${rejection}
+      <div class="detail-block"><h3>Parts used</h3>${parts}</div>
+      <div class="detail-block"><h3>History</h3>${logHtml}</div>`,
+    actions: actions.join("")
+  });
+}
+
+function addPartRow(name, quantity) {
+  const host = $("#parts");
+  if (!host) return;
+  const row = document.createElement("div");
+  row.className = "part-row";
+  row.innerHTML = `
+    <input class="input part-name" placeholder="Part or material" value="${esc(name || "")}" maxlength="60">
+    <input class="input part-qty" type="number" min="1" max="999" step="1" value="${esc(quantity || 1)}" aria-label="Quantity">
+    <button class="part-remove" type="button" data-dialog-action="remove-part" aria-label="Remove part">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>`;
+  host.appendChild(row);
+  const input = row.querySelector(".part-name");
+  if (input && !name) input.focus();
+}
+
+function openFinish(numero) {
+  const order = state.workOrders[numero];
+  if (!order) return;
+  if (!canAttend() || order.status !== "in_progress") {
+    toast("This WO is not in progress.", "error");
+    return;
+  }
+  openDialog({
+    title: "Finish repair",
+    sub: `${order.numero} · ${machineName(order.machineId)}`,
+    mode: "finish",
+    id: order.numero,
+    body: `
+      <div class="field">
+        <label for="finishDiag">Diagnosis</label>
+        <textarea id="finishDiag" placeholder="What was causing the stop?" required></textarea>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label for="finishFix">What was fixed</label>
+        <textarea id="finishFix" placeholder="What did maintenance do and how was the machine released?" required></textarea>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>Parts used</label>
+        <div id="parts"></div>
+        <button class="btn btn-ghost btn-sm" type="button" data-dialog-action="add-part" style="justify-self:start">${ICONS.plus}<span>Add part</span></button>
+      </div>
+      <p class="dialog-note">Repair time runs from the start of work until now. The WO leaves the queue and enters history.</p>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit">Finish repair</button>`
+  });
+  addPartRow();
+}
+
+async function submitFinish() {
+  const order = state.workOrders[runtime.dialogId];
+  if (!order) {
+    setDialogError("This WO no longer exists.");
+    return;
+  }
+  const diag = $("#finishDiag");
+  const fix = $("#finishFix");
+  const diagnostico = diag ? diag.value.trim() : "";
+  const oQueFoiArrumado = fix ? fix.value.trim() : "";
+  if (!diagnostico) {
+    setDialogError("Describe the diagnosis before finishing.");
+    return;
+  }
+  if (!oQueFoiArrumado) {
+    setDialogError("Describe what was fixed before finishing.");
+    return;
+  }
+  const parts = [];
+  $$("#parts .part-row").forEach((row) => {
+    const name = row.querySelector(".part-name");
+    const qty = row.querySelector(".part-qty");
+    const nome = name ? name.value.trim() : "";
+    const quantidade = qty ? Math.max(1, Math.round(Number(qty.value) || 1)) : 1;
+    if (nome) parts.push({ nome, qtd: quantidade });
+  });
+  const at = nowISO();
+  const updated = {
+    ...order,
+    status: "finished",
+    finalizadoEm: at,
+    finalizadoPor: session.login,
+    diagnostico,
+    oQueFoiArrumado,
+    pecasUtilizadas: parts,
+    statusLog: [...order.statusLog, { status: "finished", em: at, por: session.login }]
+  };
+  const ok = await persistOrder(updated);
+  closeDialog();
+  renderAllCurrent();
+  renderGestao();
+  toast(ok ? `${order.numero} finished.` : "Repair finished in this browser. Firebase did not respond.", ok ? "" : "error");
+}
+
+function openReject(numero) {
+  const order = state.workOrders[numero];
+  if (!order) return;
+  if (!canAttend() || order.status !== "in_progress") {
+    toast("Only an in-progress WO can be rejected.", "error");
+    return;
+  }
+  openDialog({
+    title: "Reject request",
+    sub: `${order.numero} · ${machineName(order.machineId)}`,
+    mode: "reject",
+    id: order.numero,
+    body: `
+      <div class="field">
+        <label for="rejectReason">Rejection reason</label>
+        <textarea id="rejectReason" placeholder="Explain why this request will not be handled." required></textarea>
+      </div>
+      <p class="dialog-note">The request leaves the queue and stays in history as rejected. Production will see the reason.</p>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button class="btn btn-outline-danger" type="submit">Reject request</button>`
+  });
+}
+
+async function submitReject() {
+  const order = state.workOrders[runtime.dialogId];
+  if (!order) {
+    setDialogError("This WO no longer exists.");
+    return;
+  }
+  const field = $("#rejectReason");
+  const motivoRejeicao = field ? field.value.trim() : "";
+  if (!motivoRejeicao) {
+    setDialogError("Enter the rejection reason.");
+    return;
+  }
+  const at = nowISO();
+  const updated = {
+    ...order,
+    status: "rejected",
+    rejeitadoEm: at,
+    rejeitadoPor: session.login,
+    motivoRejeicao,
+    statusLog: [...order.statusLog, { status: "rejected", em: at, por: session.login }]
+  };
+  const ok = await persistOrder(updated);
+  closeDialog();
+  renderAllCurrent();
+  renderGestao();
+  toast(ok ? `${order.numero} rejected.` : "Request rejected in this browser. Firebase did not respond.", ok ? "" : "error");
+}
+function openNewWo() {
+  if (!canCreate()) {
+    toast("Production opens the WO. Your role does not have permission.", "error");
+    return;
+  }
+  const machines = Object.values(state.machines).sort((a, b) => a.nome.localeCompare(b.nome, "en-US"));
+  const reasons = Object.values(state.breakReasons).sort((a, b) => a.nome.localeCompare(b.nome, "en-US"));
+  if (!machines.length || !reasons.length) {
+    toast("Add at least one machine and one reason in Management.", "error");
+    return;
+  }
+  openDialog({
+    title: "Open WO",
+    sub: "Production logs the stop. Maintenance takes over next.",
+    mode: "new-wo",
+    body: `
+      <div class="form-grid">
+        <div class="field">
+          <label for="woMachine">Machine</label>
+          <select id="woMachine" class="input">${machines.map((machine) => {
+            const active = activeOrderForMachine(machine.id);
+            return `<option value="${esc(machine.id)}">${esc(machine.nome)}${active ? ` • ${esc(active.numero)} ${esc(STATUS[active.status] ? STATUS[active.status].label : active.status)}` : ""}</option>`;
+          }).join("")}</select>
+          <div id="woMachineNotice" class="machine-notice hidden" role="alert"></div>
+        </div>
+        <div class="field">
+          <label for="woType">Type</label>
+          <select id="woType" class="input">
+            <option value="corrective">Corrective</option>
+            <option value="predictive">Predictive</option>
+            <option value="preventive">Preventive</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="woReason">Reason</label>
+          <select id="woReason" class="input">${reasons.map((reason) => `<option value="${esc(reason.id)}">${esc(reason.nome)}</option>`).join("")}</select>
+        </div>
+        <div class="field">
+          <label for="woUrgency">Urgency</label>
+          <select id="woUrgency" class="input">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label for="woDesc">What happened</label>
+        <textarea id="woDesc" placeholder="Optional: what production saw before the stop."></textarea>
+      </div>
+      <label class="check" style="margin-top:8px"><input id="woNq" type="checkbox"> Flag as non-quality</label>`,
+    actions: `<button class="btn btn-secondary" type="button" data-close>Cancel</button><button id="woSubmit" class="btn btn-primary" type="submit">Open WO</button>`
+  });
+  refreshNewWoMachine();
+}
+
+function refreshNewWoMachine() {
+  const select = $("#woMachine");
+  const notice = $("#woMachineNotice");
+  const submit = $("#woSubmit");
+  if (!select || !notice) return;
+  const machine = state.machines[select.value];
+  const active = machine ? activeOrderForMachine(machine.id) : null;
+  if (!active) {
+    notice.innerHTML = "";
+    notice.classList.add("hidden");
+    if (submit) submit.disabled = false;
+    return;
+  }
+  const status = STATUS[active.status] ? STATUS[active.status].label.toLowerCase() : active.status;
+  notice.innerHTML = `<span><strong>${esc(machine.nome)}</strong> already has <strong>${esc(active.numero)}</strong> ${esc(status)}.</span><button class="text-btn" type="button" data-dialog-action="view-active-wo" data-id="${esc(active.numero)}">View ${esc(active.numero)}</button>`;
+  notice.classList.remove("hidden");
+  if (submit) submit.disabled = true;
+}
+
+async function submitNewWo() {
+  const machineSelect = $("#woMachine");
+  const typeSelect = $("#woType");
+  const reasonSelect = $("#woReason");
+  const urgencySelect = $("#woUrgency");
+  const descField = $("#woDesc");
+  const nqField = $("#woNq");
+  const machineId = machineSelect ? machineSelect.value : "";
+  const tipo = typeSelect ? typeSelect.value : "corrective";
+  const motivoId = reasonSelect ? reasonSelect.value : "";
+  const urgencia = urgencySelect ? urgencySelect.value : "medium";
+  if (!state.machines[machineId]) {
+    setDialogError("Select a valid machine.");
+    return;
+  }
+  const active = activeOrderForMachine(machineId);
+  if (active) {
+    setDialogError(`${machineName(machineId)} already has ${active.numero} ${STATUS[active.status] ? STATUS[active.status].label.toLowerCase() : active.status}. Finish or reject it first.`);
+    refreshNewWoMachine();
+    return;
+  }
+  if (!state.breakReasons[motivoId]) {
+    setDialogError("Select a valid reason.");
+    return;
+  }
+  if (!TYPE[tipo] || !URG[urgencia]) {
+    setDialogError("Check the type and urgency.");
+    return;
+  }
+  const at = nowISO();
+  let seq = Math.max(Number(state.meta.seq) || 0, Object.keys(state.workOrders).reduce((max, numero) => {
+    const match = /^WO-(\d+)$/.exec(numero);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0));
+  let numero;
+  do {
+    seq += 1;
+    numero = `WO-${String(seq).padStart(4, "0")}`;
+  } while (state.workOrders[numero]);
+  const order = {
+    numero,
+    machineId,
+    tipo,
+    motivoId,
+    urgencia,
+    naoQualidade: !!(nqField && nqField.checked),
+    descricao: descField ? descField.value.trim() : "",
+    status: "open",
+    criadoEm: at,
+    criadoPor: session.login,
+    iniciadoEm: null,
+    iniciadoPor: "",
+    finalizadoEm: null,
+    finalizadoPor: "",
+    rejeitadoEm: null,
+    rejeitadoPor: "",
+    motivoRejeicao: "",
+    diagnostico: "",
+    oQueFoiArrumado: "",
+    pecasUtilizadas: [],
+    statusLog: [{ status: "open", em: at, por: session.login }]
+  };
+  state.meta.seq = seq;
+  state.meta.updatedAt = at;
+  const ok = await persistOrder(order);
+  persistMeta();
+  closeDialog();
+  runtime.q = "";
+  runtime.filter = "andamento";
+  const search = $("#woSearch");
+  if (search) search.value = "";
+  if (runtime.screen !== "chamados") showScreen("chamados");
+  else {
+    setFilter("andamento", false);
+    renderAllCurrent();
+  }
+  toast(ok ? `${numero} opened.` : `${numero} opened in this browser. Firebase did not respond.`, ok ? "" : "error");
+}
+
+function startOrder(numero) {
+  if (!canAttend()) {
+    toast("Only maintenance can start work.", "error");
+    return;
+  }
+  const order = state.workOrders[numero];
+  if (!order) {
+    toast("This WO no longer exists.", "error");
+    return;
+  }
+  if (order.status !== "open") {
+    toast("This WO is not waiting to start.", "error");
+    renderAllCurrent();
+    return;
+  }
+  confirmAction({
+    title: "Start repair",
+    message: `Start ${order.numero} now? Repair time starts counting.`,
+    okLabel: "Start",
+    action: async () => {
+      const at = nowISO();
+      const updated = {
+        ...order,
+        status: "in_progress",
+        iniciadoEm: at,
+        iniciadoPor: session.login,
+        statusLog: [...order.statusLog, { status: "in_progress", em: at, por: session.login }]
+      };
+      const ok = await persistOrder(updated);
+      renderAllCurrent();
+      renderGestao();
+      toast(ok ? `Work on ${order.numero} started.` : "Work started in this browser. Firebase did not respond.", ok ? "" : "error");
+    }
+  });
+}
+
+async function connectFirebase(rawUrl) {
+  const url = String(rawUrl || "").trim().replace(/\/+$/, "");
+  const error = $("#firebaseError");
+  if (error) error.textContent = "";
+  if (!validFbUrl(url)) {
+    if (error) error.textContent = "Use an https URL from a Firebase Realtime Database.";
+    return;
+  }
+  const form = $("#firebaseForm");
+  const button = form ? form.querySelector('button[type="submit"]') : null;
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Connecting...";
+  }
+  try {
+    await testFirebaseUrl(url);
+    setFbUrl(url);
+    runtime.fbUrl = url;
+    runtime.mode = "firebase";
+    stopRealtime();
+    await bootData();
+    if (runtime.offline) {
+      if (error) error.textContent = "The URL responded, but reading failed. Check the database rules.";
+    } else if (session && !state.users[session.login]) {
+      showLogin(true);
+      toast("Your account does not exist in the connected database. Sign in again.", "error");
+      return;
+    } else {
+      toast("Firebase connected. Requests are now shared.");
+    }
+    if (session) {
+      renderGestao();
+      renderAllCurrent();
+      renderNavs();
+      renderSync();
+    }
+  } catch {
+    if (error) error.textContent = "Could not read that URL. Check that the database exists and allows reads.";
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Connect";
+    }
+  }
+}
+
+function askDisconnect() {
+  if (!runtime.fbUrl) {
+    toast("The app is already in local mode.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Disconnect Firebase",
+    message: "Requests stay in this browser. The app will save locally.",
+    okLabel: "Disconnect",
+    action: async () => {
+      clearFbUrl();
+      runtime.fbUrl = "";
+      runtime.mode = "local";
+      runtime.connected = false;
+      runtime.syncError = false;
+      runtime.offline = false;
+      runtime.bannerMode = "";
+      runtime.syncing = false;
+      stopRealtime();
+      replaceState(loadLocal() || seedState());
+      saveLocal();
+      runtime.freshAt = Date.now();
+      renderGestao();
+      renderAllCurrent();
+      renderSync();
+      toast("Local mode enabled.");
+    }
+  });
+}
+
+function askPushAll() {
+  if (!runtime.fbUrl) {
+    toast("Connect Firebase before sending data.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Send data to Firebase",
+    message: "This replaces requests, machines, reasons and users in the database. Use when this browser has the right version.",
+    okLabel: "Send",
+    action: async () => {
+      const ok = await pushAll();
+      toast(ok ? "Data sent to Firebase." : "Could not send. Data remains in this browser.", ok ? "" : "error");
+    }
+  });
+}
+
+function askRestore() {
+  if (runtime.fbUrl) {
+    toast("Disconnect Firebase before restoring the demo.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Restore demo",
+    message: "Requests, machines, reasons and users in this browser return to the initial demo state.",
+    okLabel: "Restore",
+    danger: true,
+    action: async () => {
+      replaceState(seedState());
+      saveLocal();
+      runtime.q = "";
+      runtime.filter = "andamento";
+      runtime.freshAt = Date.now();
+      const search = $("#woSearch");
+      if (search) search.value = "";
+      if (session && !state.users[session.login]) {
+        showLogin(true);
+        toast("Demo restored. Sign in again.", "error");
+        return;
+      }
+      renderAllCurrent();
+      renderNavs();
+      renderSync();
+      toast("Demo restored.");
+    }
+  });
+}
+
+function askClearData() {
+  if (runtime.fbUrl) {
+    toast("Disconnect Firebase before clearing data.", "error");
+    return;
+  }
+  confirmAction({
+    title: "Clear all data?",
+    message: "This deletes all work orders in this browser and cannot be undone.",
+    okLabel: "Clear all data",
+    danger: true,
+    action: async () => {
+      replaceState({
+        workOrders: {},
+        machines: state.machines,
+        breakReasons: state.breakReasons,
+        users: state.users,
+        meta: { seq: 0, updatedAt: nowISO() }
+      });
+      saveLocal();
+      runtime.q = "";
+      runtime.filter = "andamento";
+      runtime.freshAt = Date.now();
+      const search = $("#woSearch");
+      if (search) search.value = "";
+      renderAllCurrent();
+      renderNavs();
+      renderSync();
+      toast("All work orders cleared.");
+    }
+  });
+}
+
+async function syncNow() {
+  if (!runtime.fbUrl) {
+    renderAllCurrent();
+    toast("Local mode: data is already in this browser.");
+    return;
+  }
+  await remoteRefresh(false);
+  if (runtime.connected) toast("Data updated.");
+}
+
+function logout() {
+  showLogin(true);
+  toast("Signed out.");
+}
+
+function setPeriod(value) {
+  runtime.dashPeriod = Number(value) || 0;
+  renderDashboard();
+  const subtitle = $("#pageSubtitle");
+  if (subtitle) subtitle.textContent = subtitles();
+}
+
+async function handleAction(action, id) {
+  if (action === "new-wo") openNewWo();
+  else if (action === "wo-detail") openDetail(id);
+  else if (action === "start-wo") startOrder(id);
+  else if (action === "attend-wo") openFinish(id);
+  else if (action === "logout") logout();
+  else if (action === "sync") syncNow();
+  else if (action === "add-machine") openMachineForm();
+  else if (action === "edit-machine") openMachineForm(id);
+  else if (action === "delete-machine") askDeleteMachine(id);
+  else if (action === "add-reason") openReasonForm();
+  else if (action === "edit-reason") openReasonForm(id);
+  else if (action === "delete-reason") askDeleteReason(id);
+  else if (action === "add-user") openUserForm();
+  else if (action === "edit-user") openUserForm(id);
+  else if (action === "delete-user") askDeleteUser(id);
+  else if (action === "export-csv") exportOrders();
+  else if (action === "import-csv") openImportDialog();
+  else if (action === "disconnect") askDisconnect();
+  else if (action === "push-all") askPushAll();
+  else if (action === "restore-seed") askRestore();
+  else if (action === "clear-data") askClearData();
+}
+
+function bindEvents() {
+  const loginForm = $("#loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const loginInput = $("#loginUser");
+      const passInput = $("#loginPass");
+      const error = $("#loginError");
+      const login = loginInput ? loginInput.value.trim() : "";
+      const senha = passInput ? passInput.value : "";
+      if (error) error.textContent = "";
+      if (!login || !senha) {
+        if (error) error.textContent = "Enter username and password.";
+        return;
+      }
+      if (!loginWith(login, senha, true)) {
+        if (error) error.textContent = "Invalid login or password.";
+        return;
+      }
+      if (loginInput) loginInput.value = "";
+      if (passInput) passInput.value = "";
+    });
+  }
+
+  const search = $("#woSearch");
+  if (search) {
+    search.addEventListener("input", () => {
+      runtime.q = search.value;
+      renderWoList();
+    });
+  }
+
+  const firebaseForm = $("#firebaseForm");
+  if (firebaseForm) {
+    firebaseForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = $("#firebaseUrl");
+      connectFirebase(input ? input.value : "");
+    });
+  }
+
+  const firebaseUrl = $("#firebaseUrl");
+  if (firebaseUrl) {
+    firebaseUrl.addEventListener("input", () => {
+      const error = $("#firebaseError");
+      if (error) error.textContent = "";
+    });
+  }
+
+  const dialogForm = $("#dialogForm");
+  if (dialogForm) {
+    dialogForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const mode = runtime.dialogMode;
+      if (mode === "new-wo") submitNewWo();
+      else if (mode === "finish") submitFinish();
+      else if (mode === "reject") submitReject();
+      else if (mode === "machine") submitMachine();
+      else if (mode === "reason") submitReason();
+      else if (mode === "user") submitUser();
+      else if (mode === "import") submitImport();
+    });
+  }
+
+  const appDialog = $("#appDialog");
+  if (appDialog) {
+    appDialog.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      if (target.closest("[data-close]")) {
+        closeDialog();
+        return;
+      }
+      const dialogAction = target.closest("[data-dialog-action]");
+      if (dialogAction) {
+        const kind = dialogAction.dataset.dialogAction;
+        if (kind === "start") {
+          const id = runtime.dialogId;
+          closeDialog();
+          startOrder(id);
+        } else if (kind === "finish") {
+          openFinish(runtime.dialogId);
+        } else if (kind === "reject") {
+          openReject(runtime.dialogId);
+        } else if (kind === "add-part") {
+          addPartRow();
+        } else if (kind === "remove-part") {
+          const row = dialogAction.closest(".part-row");
+          if (row) row.remove();
+        } else if (kind === "view-active-wo") {
+          openDetail(dialogAction.dataset.id);
+        }
+        return;
+      }
+      if (event.target === appDialog) closeDialog();
+    });
+    appDialog.addEventListener("close", () => {
+      runtime.dialogMode = "";
+      runtime.dialogId = "";
+    });
+  }
+
+  const confirmDialog = $("#confirmDialog");
+  const confirmOk = $("#confirmOk");
+  const confirmCancel = $("#confirmCancel");
+  if (confirmDialog) {
+    confirmDialog.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      if (target.closest("[data-confirm-close]")) {
+        confirmDialog.close();
+        return;
+      }
+      if (event.target === confirmDialog) confirmDialog.close();
+    });
+    confirmDialog.addEventListener("close", () => {
+      runtime.confirmAction = null;
+    });
+  }
+  if (confirmOk) {
+    confirmOk.addEventListener("click", async () => {
+      const action = runtime.confirmAction;
+      runtime.confirmAction = null;
+      if (confirmDialog) confirmDialog.close();
+      if (action) await action();
+    });
+  }
+  if (confirmCancel) {
+    confirmCancel.addEventListener("click", () => {
+      runtime.confirmAction = null;
+      if (confirmDialog) confirmDialog.close();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    const filterButton = target.closest("[data-filter]");
+    if (filterButton) {
+      setFilter(filterButton.dataset.filter);
+      return;
+    }
+    const navButton = target.closest("[data-nav]");
+    if (navButton) {
+      showScreen(navButton.dataset.nav);
+      return;
+    }
+    const periodButton = target.closest("[data-period]");
+    if (periodButton) {
+      setPeriod(periodButton.dataset.period);
+      return;
+    }
+    const actionButton = target.closest("[data-action]");
+    if (actionButton) {
+      handleAction(actionButton.dataset.action, actionButton.dataset.id);
+    }
+  });
+
+  document.addEventListener("change", (event) => {
+    const target = event.target;
+    if (target && target.id === "woMachine") {
+      refreshNewWoMachine();
+      return;
+    }
+    if (!target || target.id !== "csvFile") return;
+    const file = target.files && target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const textarea = $("#csvRows");
+      if (textarea) textarea.value = String(reader.result || "");
+    };
+    reader.onerror = () => setDialogError("Could not read the file.");
+    reader.readAsText(file, "utf-8");
+  });
+
+  window.addEventListener("online", () => {
+    if (runtime.fbUrl) remoteRefresh(true);
+  });
+
+  window.addEventListener("offline", () => {
+    if (runtime.fbUrl) {
+      runtime.connected = false;
+      renderSync();
+    }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && runtime.fbUrl) remoteRefresh(true);
+  });
+
+  const logoutBtn = $("#logoutBtn");
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+}
+
+function startTicker() {
+  if (tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    updateLiveTimes();
+    if (session) {
+      renderChamadosKpis();
+      const subtitle = $("#pageSubtitle");
+      if (subtitle) subtitle.textContent = subtitles();
+      if (runtime.screen === "dashboard") renderDashboard();
+    } else {
+      renderLogin();
+    }
+  }, 30000);
+}
+
+async function init() {
+  replaceState(loadLocal() || seedState());
+  renderLogin();
+  renderSync();
+  bindEvents();
+  await bootData();
+  const params = new URLSearchParams(window.location.search);
+  const demo = params.get("demo");
+  const wanted = params.get("screen");
+  if (demo) {
+    const user = Object.values(state.users).find((item) => norm(item.login) === norm(demo));
+    if (user) afterLogin(user, wanted, false);
+    else showLogin(false);
+  } else {
+    const saved = readSession();
+    if (saved && state.users[saved.login]) afterLogin(state.users[saved.login], wanted, false);
+    else showLogin(false);
+  }
+  renderSync();
+  startTicker();
+}
+
+init();
+</script>
+</body>
+</html>
