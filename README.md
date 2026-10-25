@@ -29,6 +29,12 @@ Workshop is a factory maintenance request system. Production logs a machine stop
 
 Live demo: https://maintenancews.netlify.app
 
+
+
+https://github.com/user-attachments/assets/2ebffb6f-5947-4512-b3d8-fb383c011207
+
+
+
 Demo logins:
 
 - production / production123
